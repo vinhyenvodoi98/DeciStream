@@ -6,7 +6,7 @@ import Layout from '@/components/layout/Layout';
 import { useReadContract } from '@/hook/useReadContract';
 import { useWriteContract } from '@/hook/useWriteContract';
 import Text from '@/components/Text';
-import Categories from '@/components/Categories';
+import TravelDao from '@/components/TravelDao';
 import CurrentSteams from '@/components/CurrentSteams';
 
 export default function HomePage() {
@@ -14,7 +14,7 @@ export default function HomePage() {
   // const { triggerTransactions } = useWriteContract();
   return (
     <Layout>
-      <Categories />
+      <TravelDao />
       <CurrentSteams />
       {/* <div>data: {data}</div>
       <button onClick={() => triggerTransactions('increment')}>Click</button> */}

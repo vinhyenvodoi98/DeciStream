@@ -12,7 +12,7 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'bankless.ghost.io',
+        hostname: 'bridgesandballoons.com',
         port: '',
       },
       {
