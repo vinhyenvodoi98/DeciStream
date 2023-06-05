@@ -10,10 +10,10 @@ export default function Streams() {
   return (
     <Layout>
       <div className='grid grid-cols-4 gap-4'>
-        <div className='col-span-3 bg-slate-50 h-[600px] rounded-xl'>
+        <div className='col-span-3 h-[600px] rounded-xl shadow'>
           video
         </div>
-        <div className='bg-neutral-400 h-[600px] rounded-xl'>
+        <div className='h-[600px] rounded-xl shadow'>
           <Comments />
         </div>
       </div>

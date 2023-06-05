@@ -60,7 +60,7 @@ function MyApp({ Component, pageProps }: AppProps) {
   }
 
   return (
-    <div className='bg-dark min-h-screen'>
+    <div className='min-h-screen'>
       <WagmiConfig config={wagmiConfig}>
         <RainbowKitProvider chains={chains}>
           <QueryClientProvider client={reactQueryClient}>

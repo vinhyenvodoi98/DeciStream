@@ -18,7 +18,7 @@ export default function CurrentSteams () {
 
 function Video ({id}: {id: any}) {
   return (
-    <Link href={`/streams/${id}`} className="flex items-center justify-center w-full h-[380px]">
+    <Link href={`/streams/${id}`} className="flex items-center justify-center w-full h-[380px] shadow rounded-xl">
       <div className="w-full h-full">
         <div className="relative rounded-xl w-full h-2/3 p-16 content-evenly items-center overflow-hidden cursor-pointer">
           <Image

@@ -45,22 +45,22 @@ const Comments = () => {
   };
 
   return (
-  <div className="p-4 flex flex-col h-full bg-gray-200 rounded-xl">
+  <div className="p-4 flex flex-col h-full rounded-xl">
     <h2 className="text-xl font-bold mb-4">Comments</h2>
     <ul className="flex-grow overflow-y-auto" ref={commentListRef}>
       {comments.map((comment) => (
         <li
           key={comment.id}
-          className={`flex ${
+          className={`ml-2 mb-2 rounded-xl ${
             comment.id % 2 === 0 ? 'justify-end' : 'justify-start'
           }`}
         >
           <div
-            className={`bg-white rounded-lg p-2 max-w-xs ${
+            className={`rounded-lg p-2 max-w-xs inline-block shadow ${
               comment.id % 2 === 0 ? 'ml-4' : 'mr-4'
             }`}
           >
-            <p>{comment.content}</p>
+            <p className="whitespace-pre-wrap break-words">{comment.content}</p>
           </div>
         </li>
       ))}

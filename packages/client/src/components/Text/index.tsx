@@ -6,7 +6,7 @@ interface TextProp {
 
 export default function Text({ content, color, size}:TextProp) {
   return (
-    <p className={`${size} || "text-base"} ${ color || "text-white font-montserrat font-semibold"}`}>
+    <p className={`${size} || "text-base"} ${ color || "text-black" } font-montserrat font-semibold`}>
       {content}
     </p>
   )
