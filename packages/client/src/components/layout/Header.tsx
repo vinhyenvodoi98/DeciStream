@@ -2,8 +2,9 @@ import * as React from 'react';
 import Text from '../Text';
 
 import Wallet from '../Wallet';
-import { Notification, WriteIcon } from '../Icon';
+import { WriteIcon } from '../Icon';
 import Link from 'next/link';
+import Notification from '../Notification';
 
 export default function Header() {
   return (
