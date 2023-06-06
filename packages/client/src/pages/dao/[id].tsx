@@ -2,15 +2,37 @@ import * as React from 'react';
 import { useAccount } from 'wagmi';
 
 import Layout from '@/components/layout/Layout';
-import Text from '@/components/Text';
 import Vote from '@/components/Vote';
 import DaoNft from '@/components/DaoNft';
+import EditorJsRenderer from '@/components/Editor/EditorJsRenderer';
 
-const description = "Dear friends, \
-I have a thrilling proposition for you. I'm seeking financial support to fulfill my lifelong dream of personal travel. In return, I will live stream my incredible travel experiences, allowing you to be a part of every moment. \
-Your contribution will enable me to explore captivating destinations, sharing the sights, sounds, and stories through live streaming. Together, we can break down barriers and experience the world's wonders. \
-I appreciate your support and offer special perks as a token of gratitude. Let's embark on this adventure together and create lasting memories. \
-Thank you for considering my request, and I can't wait to take you on an unforgettable virtual travel experience."
+const contents = {
+  time: 1686060802429,
+  blocks:[{
+    id:"7MCCCx2E0B",
+    type:"header",
+    data:{
+      text:"Hello world",
+      level:3
+    }},{
+      id:"k2awdZazJz",
+      type:"paragraph",
+      data:{
+        text:"Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. Aenean le"
+      }},{
+          id:"IdKbrWd0MQ",type:"list",data:{style:"ordered","items":["đâsdasd","ádf","23ẻt","rtgh"]}
+        },{
+          id:"Bij3_TAumW",
+          type:"delimiter",
+          data:{}
+        },{
+          id:"r9Rvcl99DB",
+          type:"paragraph",
+          data:{
+            text:"Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidus"
+          }}],
+          version:"2.27.0"
+        }
 
 const daos = [{
   place: "Senso-ji Temple",
@@ -29,22 +51,19 @@ const daos = [{
   description: "Tokyo Disneyland and DisneySea are two of the most popular theme parks in Tokyo. Tokyo Disneyland offers classic Disney attractions and magical experiences, while DisneySea has a unique nautical and adventure theme. Both parks provide thrilling rides, shows, parades, and a memorable experience for visitors of all ages."
 }]
 
+type ParsedContent = string | JSX.Element;
+const editorJsHtml = require("editorjs-html");
+const EditorJsToHtml = editorJsHtml();
+
 export default function Dao() {
+  const html = EditorJsToHtml.parse(contents) as ParsedContent[];
   return (
     <Layout>
       <div className='grid grid-cols-4 gap-4 h-full'>
-        <div className='col-span-3'>
-          <div className='bg-slate-700/50 rounded-xl'>
-            <Text content={description}/>
-          </div>
-          <div>
-            {daos.map(dao => <div>
-              <Text content={dao.place} size="text-xl"/>
-              <Text content={dao.description}/>
-            </div>)}
-          </div>
+        <div className='col-span-3 px-12 shadow rounded-xl'>
+          <EditorJsRenderer data={contents}/>
         </div>
-        <div className='bg-neutral-400 py-4 rounded-xl'>
+        <div className='shadow py-4 rounded-xl'>
           <DaoNft />
           <Vote />
         </div>

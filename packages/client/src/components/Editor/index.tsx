@@ -1,64 +1,45 @@
-import React, { useEffect, useRef } from 'react';
-import dynamic from 'next/dynamic';
+//./components/Editor
+import React, { memo, useEffect, useRef } from "react";
+import EditorJS, { OutputData } from "@editorjs/editorjs";
+import { EDITOR_TOOLS } from "./EditorTools";
 
-interface EditorComponentProps {
-  onChange: (data: EditorJS.OutputData) => void;
-}
+//props
+type Props = {
+  data?: OutputData;
+  onChange(val: OutputData): void;
+  holder: string;
+};
 
-const EditorComponent: React.FC<EditorComponentProps> = ({ onChange }) => {
-  const editorRef = useRef<HTMLDivElement | null>(null);
+const EditorBlock = ({ data, onChange, holder }: Props) => {
+  //add a reference to editor
+  const ref = useRef<EditorJS>();
 
+  //initialize editorjs
   useEffect(() => {
-    let editor: EditorJS | null = null;
-
-    const loadEditor = async () => {
-      const editorModule = await import('@editorjs/editorjs');
-      const HeaderModule = await import('@editorjs/header');
-      const ListModule = await import('@editorjs/list');
-      const SimpleImageModule = await import('@editorjs/simple-image');
-
-      editor = new editorModule.default({
-        holder: editorRef.current!,
-        autofocus: true,
-        onChange: async () => {
-          if (editor) {
-            const outputData = await editor.save();
-            onChange(outputData);
-          }
-        },
-        tools: {
-          header: HeaderModule.default,
-          list: ListModule.default,
-          simpleImage: SimpleImageModule.default,
-        },
-        data: {
-          blocks: [
-            {
-              type: 'header',
-              data: {
-                text: 'Your Title',
-                level: 1,
-              },
-            },
-          ], // Provide initial blocks or an empty array
+    //initialize editor if we don't have a reference
+    if (!ref.current) {
+      const editor = new EditorJS({
+        holder: holder,
+        tools: EDITOR_TOOLS,
+        data,
+        async onChange(api, event) {
+          const data = await api.saver.save();
+          onChange(data);
         },
       });
-    };
+      ref.current = editor;
+    }
 
-    loadEditor();
-
+    //add a return function handle cleanup
     return () => {
-      if (editor) {
-        editor.isReady
-          .then(() => {
-            editor!.destroy();
-          })
-          .catch((error) => console.error('Editor cleanup error:', error));
+      if (ref.current && ref.current.destroy) {
+        ref.current.destroy();
       }
     };
   }, []);
 
-  return <div ref={editorRef}></div>;
+
+  return <div id={holder} />;
 };
 
-export default EditorComponent;
+export default memo(EditorBlock);
