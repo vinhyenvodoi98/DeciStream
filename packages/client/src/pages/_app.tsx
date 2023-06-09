@@ -18,6 +18,7 @@ import '@/styles/colors.css';
 import '@rainbow-me/rainbowkit/styles.css';
 
 import { useIsSsr } from '../utils/ssr';
+import { createReactClient, studioProvider, LivepeerConfig , ThemeConfig} from '@livepeer/react';
 
 const { chains, publicClient, webSocketPublicClient } = configureChains(
   [
@@ -53,6 +54,22 @@ const reactQueryClient = new QueryClient({
   },
 });
 
+const livepeerClient = createReactClient({
+  provider: studioProvider({
+    apiKey: process.env.NEXT_PUBLIC_STUDIO_API_KEY || '',
+  }),
+});
+
+const theme: ThemeConfig = {
+  colors: {
+    accent: 'rgb(0, 145, 255)',
+    containerBorderColor: 'rgba(0, 145, 255, 0.9)',
+  },
+  fonts: {
+    display: 'Inter',
+  },
+};
+
 function MyApp({ Component, pageProps }: AppProps) {
   const isSsr = useIsSsr();
   if (isSsr) {
@@ -64,7 +81,9 @@ function MyApp({ Component, pageProps }: AppProps) {
       <WagmiConfig config={wagmiConfig}>
         <RainbowKitProvider chains={chains}>
           <QueryClientProvider client={reactQueryClient}>
-            <Component {...pageProps} />
+            <LivepeerConfig client={livepeerClient} theme={theme}>
+              <Component {...pageProps} />
+            </LivepeerConfig>
           </QueryClientProvider>
         </RainbowKitProvider>
       </WagmiConfig>

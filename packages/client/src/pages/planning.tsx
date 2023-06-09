@@ -2,7 +2,6 @@ import * as React from 'react';
 
 import Layout from '@/components/layout/Layout';
 import { OutputData } from "@editorjs/editorjs";
-import type { NextPage } from "next";
 import dynamic from "next/dynamic";
 
 const EditorBlock = dynamic(() => import("../components/Editor"), {
@@ -10,6 +9,7 @@ const EditorBlock = dynamic(() => import("../components/Editor"), {
 });
 
 import TokenDaoCreator from '@/components/TokenDaoCreator';
+import { useUploadMetadata } from '@/hook/useUploadNFTStorage';
 
 export default function HomePage() {
   const [editorData, setEditorData] = React.useState<OutputData>({
@@ -18,12 +18,17 @@ export default function HomePage() {
         type: 'header',
         data: {},
       },
-    ], // Provide initial blocks or an empty array
+    ],
   },);
 
   const handleEditorChange = (data: any) => {
     setEditorData(data);
   };
+
+  const createPlanning = async () => {
+    const url = await useUploadMetadata(editorData);
+    console.log({url})
+  }
 
   return (
     <Layout>
@@ -32,7 +37,7 @@ export default function HomePage() {
           <EditorBlock data={editorData} onChange={handleEditorChange} holder="editorjs-container"/>
         </div>
         <div>
-          <TokenDaoCreator />
+          <TokenDaoCreator onSubmit={createPlanning} />
         </div>
       </div>
     </Layout>
