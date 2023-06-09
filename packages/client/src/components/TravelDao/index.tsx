@@ -1,11 +1,36 @@
-import Image from "next/image"
+import { useState, useEffect } from 'react';
 import Link from "next/link"
 import Text from "../Text"
+import { Database } from "@tableland/sdk";
 
 const imageExample = "https://bridgesandballoons.com/Images/2016/02/Japan-itinerary-20.jpg"
 
+const tableName: string = "Posts_80001_6821";
+
+interface Posts {
+  id: number;
+  val: string;
+}
+
 export default function TravelDaos () {
   const travelDaos = [1,2,3,4,5,6,7,8,9,10]
+  const [data, setData] = useState<any>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const db = new Database<Posts>();
+        const { results } = await db.prepare<Posts>(`SELECT * FROM ${tableName};`).all();
+        console.log({results})
+        setData(results);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
   return (
     <div className="py-6">
       <Text content='Travel Dao Zone' size='text-2xl' />
