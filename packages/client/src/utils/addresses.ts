@@ -1,7 +1,5 @@
 import { getAddress, isAddress } from '@ethersproject/address';
 
-import { logger } from './logger';
-
 // Validates content and checksum
 export function isValidAddress(address: string) {
   // Need to catch because ethers' isAddress throws in some cases (bad checksum)
@@ -9,7 +7,7 @@ export function isValidAddress(address: string) {
     const isValid = address && isAddress(address);
     return !!isValid;
   } catch (error) {
-    logger.warn('Invalid address', error, address);
+    console.warn('Invalid address', error, address);
     return false;
   }
 }
@@ -23,7 +21,7 @@ export function isValidAddressFast(address: string) {
 export function validateAddress(address: string, context: string) {
   if (!address || !isAddress(address)) {
     const errorMsg = `Invalid addresses for ${context}: ${address}`;
-    logger.error(errorMsg);
+    console.error(errorMsg);
     throw new Error(errorMsg);
   }
 }
@@ -42,8 +40,8 @@ export function shortenAddress(address: string, capitalize?: boolean) {
       normalized.substring(normalized.length - 4);
     return capitalize ? capitalizeAddress(shortened) : shortened;
   } catch (error) {
-    logger.error('Unable to shorten invalid address', address, error);
-    return null;
+    console.error('Unable to shorten invalid address', address, error);
+    return '';
   }
 }
 

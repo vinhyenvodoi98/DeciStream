@@ -9,7 +9,7 @@ export default function CurrentSteams () {
   return (
     <div>
       <Text content='Streams of the day' size='text-2xl' />
-        <div className="relative p-6 grid grid-cols-4 gap-6">
+        <div className="relative py-6 grid grid-cols-4 gap-6">
         {categories.map(category => <Video key={category} id={category}/>)}
       </div>
     </div>

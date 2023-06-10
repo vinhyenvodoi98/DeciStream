@@ -12,7 +12,7 @@ interface Posts {
   val: string;
 }
 
-export default function TravelDaos () {
+export default function PodCastDaos () {
   const travelDaos = [1,2,3,4,5,6,7,8,9,10]
   const [data, setData] = useState<any>([]);
 
@@ -33,15 +33,15 @@ export default function TravelDaos () {
 
   return (
     <div className="py-6">
-      <Text content='Travel Dao Zone' size='text-2xl' />
-      <div className="relative p-6 grid grid-cols-5 gap-6">
-        {travelDaos.map(travleDao => <Video key={travleDao} id={travleDao}/>)}
+      <Text content='PodCast Dao Zone' size='text-2xl' />
+      <div className="relative py-6 grid grid-cols-5 gap-6">
+        {travelDaos.map(travleDao => <DaoLabel key={travleDao} id={travleDao}/>)}
       </div>
     </div>
   )
 }
 
-function Video ({id}: {id: any}) {
+function DaoLabel ({id}: {id: any}) {
   return (
     <Link href={`/dao/${id}`} className="flex items-center justify-center w-full rounded-lg shadow">
       <div className="p-4 grid grid-cols-4 gap-4">

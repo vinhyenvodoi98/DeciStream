@@ -4,7 +4,7 @@ import Header from './Header';
 export default function Layout({ children }: { children: React.ReactNode }) {
   // Put Header or Footer Here
   return(
-    <div className='px-[12px] min-h-screen'>
+    <div className='px-8 min-h-screen'>
       <Header />
       {children}
     </div>

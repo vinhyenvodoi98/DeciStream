@@ -12,7 +12,7 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'bridgesandballoons.com',
+        hostname: 'ipfs.io',
         port: '',
       },
       {
