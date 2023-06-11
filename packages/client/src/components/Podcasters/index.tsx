@@ -20,12 +20,14 @@ export default function Podcasters() {
 function Podcaster({address}: {address: string}) {
   const { data } = useEnsName({
     address: address as `0x${string}`,
-    scopeKey: address
+    scopeKey: address,
+    chainId: 1
   })
 
   const ensAvatar = useEnsAvatar({
     name: data,
-    scopeKey: address
+    scopeKey: address,
+    chainId: 1
   })
 
   return (

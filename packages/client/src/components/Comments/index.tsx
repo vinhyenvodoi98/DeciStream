@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import Text from '../Text';
 
 interface Comment {
   id: number;
@@ -46,7 +47,7 @@ const Comments = () => {
 
   return (
   <div className="p-4 flex flex-col h-full rounded-xl">
-    <h2 className="text-xl font-bold mb-4">Comments</h2>
+    <Text content="Comments" size="text-xl"/>
     <ul className="flex-grow overflow-y-auto" ref={commentListRef}>
       {comments.map((comment) => (
         <li

@@ -40,12 +40,14 @@ const Profile: React.FC = () => {
 
   const { data } = useEnsName({
     address: address as `0x${string}`,
-    scopeKey: address as `0x${string}` || ''
+    scopeKey: address as `0x${string}` || '',
+    chainId: 1
   })
 
   const ensAvatar = useEnsAvatar({
     name: data,
-    scopeKey: address as `0x${string}`
+    scopeKey: address as `0x${string}`,
+    chainId: 1
   })
 
   return (
