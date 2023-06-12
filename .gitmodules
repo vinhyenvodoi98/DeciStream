@@ -1,3 +1,6 @@
 [submodule "packages/contracts/lib/openzeppelin-contracts"]
 	path = packages/contracts/lib/openzeppelin-contracts
 	url = https://github.com/OpenZeppelin/openzeppelin-contracts
+[submodule "packages/contracts/lib/evm-tableland"]
+	path = packages/contracts/lib/evm-tableland
+	url = https://github.com/tablelandnetwork/evm-tableland
