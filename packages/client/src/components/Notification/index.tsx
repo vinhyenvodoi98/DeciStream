@@ -14,7 +14,7 @@ const Notification = () => {
   useEffect(() => {
     const main = async (address: string) => {
       const spams = await PushAPI.user.getFeeds({
-        user: `eip155:5:${address}`, // user address in CAIP
+        user: `eip155:80001:${address}`, // user address in CAIP
         env: 'staging',
       });
       console.log(spams)
