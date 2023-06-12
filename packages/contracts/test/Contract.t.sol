@@ -3,12 +3,12 @@ pragma solidity ^0.8.13;
 
 import "forge-std/Test.sol";
 
-import "src/Counter.sol";
+import "src/DeciStream.sol";
 
-contract TestCounter is Test {
-    Counter c;
+contract TestDeciStream is Test {
+    DeciStream c;
 
     function setUp() public {
-        c = new Counter();
+        c = new DeciStream();
     }
 }
