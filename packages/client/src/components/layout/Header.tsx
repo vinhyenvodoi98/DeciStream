@@ -8,7 +8,8 @@ import Notification from '../Notification';
 
 export default function Header() {
   return (
-    <header className='sticky top-0 z-50 bg-white'>
+    // sticky
+    <header className='top-0 z-50 bg-white'>
       <div className='flex h-20 items-center justify-between'>
         <Link href="/" className='flex items-center pr-6'>
           <Text content="ĐeciPodCast" size='text-2xl'/>

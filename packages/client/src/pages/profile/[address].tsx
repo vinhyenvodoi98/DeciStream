@@ -7,12 +7,14 @@ import { useAccount, useEnsAvatar, useEnsName, useWalletClient } from "wagmi";
 import { shortenAddress } from "@/utils/addresses";
 import Image from "next/image";
 import * as PushAPI from "@pushprotocol/restapi";
+import CreateChannel from "@/components/CreateChannel";
 
 const Profile: React.FC = () => {
   const router = useRouter()
   const { address } = router.query
   const { data: walletClient, isError, isLoading } = useWalletClient()
   const account = useAccount();
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
 
   const videos = [
     {
@@ -44,18 +46,18 @@ const Profile: React.FC = () => {
   }, [])
 
   const handleSubcribe = async () => {
-    await PushAPI.channels.subscribe({
-      signer: walletClient,
-      channelAddress: 'eip155:80001:0xD8634C39BBFd4033c0d3289C4515275102423681', // channel address in CAIP
-      userAddress: 'eip155:80001:0x52f856A160733A860ae7DC98DC71061bE33A28b3', // user address in CAIP
-      onSuccess: () => {
-       console.log('opt in success');
-      },
-      onError: () => {
-        console.error('opt in error');
-      },
-      env: 'staging'
-    })
+    // await PushAPI.channels.subscribe({
+    //   signer: walletClient,
+    //   channelAddress: 'eip155:80001:0xD8634C39BBFd4033c0d3289C4515275102423681', // channel address in CAIP
+    //   userAddress: 'eip155:80001:0x52f856A160733A860ae7DC98DC71061bE33A28b3', // user address in CAIP
+    //   onSuccess: () => {
+    //    console.log('opt in success');
+    //   },
+    //   onError: () => {
+    //     console.error('opt in error');
+    //   },
+    //   env: 'staging'
+    // })
   }
 
   const chandleCeateChannel = async () => {
@@ -72,12 +74,13 @@ const Profile: React.FC = () => {
               <div className="flex items-center">
                 {
                   account.address === address
-                  ? <button
-                    className="ml-auto bg-black text-white font-bold py-2 px-4 rounded"
-                    onClick={() => chandleCeateChannel()}
-                    >
-                      Create Channel
-                    </button>
+                  ? <CreateChannel isOpen={isCreateModalOpen} onOpen={()=>setIsCreateModalOpen(true)} onClose={()=>setIsCreateModalOpen(false)}/>
+                  // ? <button
+                  //   className="ml-auto bg-black text-white font-bold py-2 px-4 rounded"
+                  //   onClick={() => chandleCeateChannel()}
+                  //   >
+                  //     Create Channel
+                  //   </button>
                   : <button
                     className="ml-auto bg-black text-white font-bold py-2 px-4 rounded"
                     onClick={() => handleSubcribe()}
