@@ -1,7 +1,6 @@
 import Link from "next/link"
 import Text from "../Text"
 import { useEnsAvatar, useEnsName } from 'wagmi'
-import { AvatarSkeleton, TextSkeleton } from "../Skeleton"
 import { shortenAddress } from "@/utils/addresses"
 import Image from "next/image"
 import { useReadTableLand } from "@/hook/useReadTableLand"

@@ -14,13 +14,13 @@ const CreateChannel: React.FC<ModalProps> = ({ isOpen, onOpen, onClose }) => {
   const [name, setName] = useState('');
   const [symbol, setSymbol] = useState('');
   const [image, setImage] = useState<File | null>(null);
-  const { triggerTransactions } = useWriteContract()
+  const { triggerMasterTransactions } = useWriteContract()
 
   const handleSubmit = async (e: React.FormEvent) => {
     if(image) {
       e.preventDefault();
       const channelImage = await useUploadImage(image)
-      triggerTransactions("createChannel", [name, symbol ,`https://${channelImage}.ipfs.nftstorage.link`])
+      triggerMasterTransactions("createChannel", [name, symbol ,`https://${channelImage}.ipfs.nftstorage.link`])
       onClose();
     }
   };

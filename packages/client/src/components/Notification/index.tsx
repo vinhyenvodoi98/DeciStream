@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { NotificationIcon } from '../Icon';
 import * as PushAPI from "@pushprotocol/restapi";
 import { useAccount } from 'wagmi';
+import { useGetNotifications } from '@/hook/usePush';
 
 const Notification = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -11,20 +12,9 @@ const Notification = () => {
     setIsOpen(!isOpen);
   };
 
-  useEffect(() => {
-    const main = async (address: string) => {
-      const spams = await PushAPI.user.getFeeds({
-        user: `eip155:80001:${address}`, // user address in CAIP
-        env: 'staging',
-      });
-      console.log(spams)
-    }
-    if(address) main(address)
-  }, [address])
-
+  const {data} = useGetNotifications(address as string)
   return (
     <div className="relative inline-block text-left">
-      {/* Biểu tượng chuông */}
       <button
         type="button"
         className="relative z-10 block text-gray-500 hover:text-gray-900 focus:text-gray-900 focus:outline-none"

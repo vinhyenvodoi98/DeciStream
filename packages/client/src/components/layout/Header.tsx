@@ -18,9 +18,9 @@ export default function Header() {
           <Link href="/planning" className='flex items-center pr-6'>
             <WriteIcon />
           </Link>
-          <Link href="/" className='flex items-center pr-6'>
+          <div className='flex items-center pr-6'>
             <Notification />
-          </Link>
+          </div>
           <Wallet />
         </div>
       </div>

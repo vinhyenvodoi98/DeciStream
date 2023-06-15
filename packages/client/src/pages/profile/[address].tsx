@@ -2,18 +2,22 @@ import { CheckIcon, CopyIcon } from "@/components/Icon";
 import { useRouter } from 'next/router'
 import Layout from "@/components/layout/Layout";
 import Text from "@/components/Text";
-import React, { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useAccount, useEnsAvatar, useEnsName } from "wagmi";
 import { shortenAddress } from "@/utils/addresses";
 import Image from "next/image";
-import * as PushAPI from "@pushprotocol/restapi";
 import CreateChannel from "@/components/CreateChannel";
 import { useReadTableLand } from "@/hook/useReadTableLand";
+import { useGetSubcriber } from "@/hook/usePush";
+import { useWriteContract } from "@/hook/useWriteContract";
 
 const Profile: React.FC = () => {
   const router = useRouter()
   const { address } = router.query
   const { data } = useReadTableLand("Channels");
+  const sub = useReadTableLand("Subscriptions");
+  const subcribers = useGetSubcriber()
+  const { triggerSubscribe } = useWriteContract();
 
   const account = useAccount();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
@@ -36,18 +40,17 @@ const Profile: React.FC = () => {
     },
   ];
 
-  useEffect(() => {
-    const getSubscibers = async () => {
-    // const subscriptions = await PushAPI.channels.getSubscribers({
-    //   channel: 'eip155:80001:0xdA0AE9002cE609F8707f4Cb5D45704b7aAa78624', // user address in CAIP
-    //   env: 'staging'
-    // });
-    // console.log({subscriptions})
-   }
-   getSubscibers()
-  }, [])
+  const currentChannel = useMemo(
+    () => {
+      if(!data || !account) {return {}}
+      const fillter =  data.filter((data : any) => data.user_address.toLowerCase() === String(address).toLowerCase() )
+      return fillter[0]
+    },
+    [data, account.address],
+  )
 
   const handleSubcribe = async () => {
+    await triggerSubscribe(currentChannel.subscription_erc721_address);
     // await PushAPI.channels.subscribe({
     //   signer: walletClient,
     //   channelAddress: 'eip155:80001:0xD8634C39BBFd4033c0d3289C4515275102423681', // channel address in CAIP
@@ -61,6 +64,7 @@ const Profile: React.FC = () => {
     //   env: 'staging'
     // })
   }
+
   const isHaveChannel = useMemo(
     () => {
       if(!data || !account) {return false}
@@ -70,9 +74,14 @@ const Profile: React.FC = () => {
     [data, account.address],
   )
 
-  const chandleCeateChannel = async () => {
-    console.log("create channel")
-  }
+  // const isOptIn = useMemo(
+  //   () => {
+  //     if(!subcribers || !account) {return false}
+  //     const fillter =  subcribers.data.subscribers.filter((sub : string) => sub.toLowerCase() === String(account.address).toLowerCase() )
+  //     return fillter.length === 1
+  //   },
+  //   [subcribers.data, account.address],
+  // )
 
   return (
     <Layout>
@@ -82,13 +91,14 @@ const Profile: React.FC = () => {
             <div className="flex justify-between">
               {address && <ProfileENS address={address as string}/> }
               {isHaveChannel ||
-                <div className="flex items-center">
+                <div className="flex items-end">
                   {
                     account.address === address
                     ? <CreateChannel isOpen={isCreateModalOpen} onOpen={()=>setIsCreateModalOpen(true)} onClose={()=>setIsCreateModalOpen(false)}/>
                     : <button
                       className="ml-auto bg-black text-white font-bold py-2 px-4 rounded"
                       onClick={() => handleSubcribe()}
+                      disabled={!currentChannel.subscription_erc721_address}
                       >
                         Subscribe
                       </button>
