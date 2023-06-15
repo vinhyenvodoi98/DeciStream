@@ -20,7 +20,7 @@ const CreateChannel: React.FC<ModalProps> = ({ isOpen, onOpen, onClose }) => {
     if(image) {
       e.preventDefault();
       const channelImage = await useUploadImage(image)
-      triggerMasterTransactions("createChannel", [name, symbol ,`https://${channelImage}.ipfs.nftstorage.link`])
+      await triggerMasterTransactions("createChannel", [name, symbol ,`https://${channelImage}.ipfs.nftstorage.link`])
       onClose();
     }
   };
@@ -38,7 +38,7 @@ const CreateChannel: React.FC<ModalProps> = ({ isOpen, onOpen, onClose }) => {
         className="ml-auto bg-black text-white font-bold py-2 px-4 rounded"
         onClick={onOpen}
       >
-        Open Modal
+        Create Channel
       </button>
 
       {isOpen && (

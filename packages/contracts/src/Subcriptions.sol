@@ -23,7 +23,7 @@ contract Subcriptions is ERC721, Ownable {
     _mint(msg.sender, newTokenId);
     _tokenId.increment();
 
-    Master(_masterAddress).updateSubcription(address(this), msg.sender, newTokenId);
+    Master(_masterAddress).insertSubcription(address(this), msg.sender, newTokenId);
   }
 
   function _baseURI() internal override view virtual returns (string memory) {

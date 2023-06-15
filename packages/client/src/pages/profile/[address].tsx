@@ -10,6 +10,7 @@ import CreateChannel from "@/components/CreateChannel";
 import { useReadTableLand } from "@/hook/useReadTableLand";
 import { useGetSubcriber } from "@/hook/usePush";
 import { useWriteContract } from "@/hook/useWriteContract";
+import * as PushAPI from "@pushprotocol/restapi";
 
 const Profile: React.FC = () => {
   const router = useRouter()
@@ -50,16 +51,16 @@ const Profile: React.FC = () => {
   )
 
   const handleSubcribe = async () => {
-    await triggerSubscribe(currentChannel.subscription_erc721_address);
+    // await triggerSubscribe(currentChannel.subscription_erc721_address);
     // await PushAPI.channels.subscribe({
-    //   signer: walletClient,
+    //   signer: ,
     //   channelAddress: 'eip155:80001:0xD8634C39BBFd4033c0d3289C4515275102423681', // channel address in CAIP
     //   userAddress: 'eip155:80001:0x52f856A160733A860ae7DC98DC71061bE33A28b3', // user address in CAIP
     //   onSuccess: () => {
     //    console.log('opt in success');
     //   },
-    //   onError: () => {
-    //     console.error('opt in error');
+    //   onError: (error) => {
+    //     console.error('opt in error',error);
     //   },
     //   env: 'staging'
     // })
@@ -72,6 +73,18 @@ const Profile: React.FC = () => {
       return fillter.length === 1
     },
     [data, account.address],
+  )
+
+  const isSubscribed = useMemo(
+    () => {
+      if(!sub.data || !account) {return false}
+      const fillter =  sub.data.filter((data : any) => (
+        data.subscriber_address.toLowerCase() === String(account.address).toLowerCase() &&
+        data.subscription_erc721_address.toLowerCase() === String(address).toLowerCase()
+      ))
+      return fillter.length === 1
+    },
+    [sub.data, account.address, address],
   )
 
   // const isOptIn = useMemo(
@@ -100,7 +113,7 @@ const Profile: React.FC = () => {
                       onClick={() => handleSubcribe()}
                       disabled={!currentChannel.subscription_erc721_address}
                       >
-                        Subscribe
+                        {isSubscribed ? "Subscribed" : "Subscribe"}
                       </button>
                   }
                 </div>
@@ -169,7 +182,7 @@ function ProfileENS({address}:{address: string}) {
           height={96}
           alt="Avatar"
         />
-        : <img src={`https://robohash.org/${address}&200x200`} className="h-24 w-24 rounded-full" alt="Avatar"/>
+        : <img src={`https://robohash.org/${address}&200x200`} className="border-2 bg-indigo-300 h-24 w-24 rounded-full" alt="Avatar"/>
       }
       <div className="flex">
         <h1 className="text-3xl font-bold mt-4">{data || shortenAddress(address as `0x${string}`)}</h1>
