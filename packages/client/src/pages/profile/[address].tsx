@@ -3,22 +3,22 @@ import { useRouter } from 'next/router'
 import Layout from "@/components/layout/Layout";
 import Text from "@/components/Text";
 import { useMemo, useState } from "react";
-import { useAccount, useEnsAvatar, useEnsName } from "wagmi";
+import { useAccount, useSigner, useEnsAvatar, useEnsName } from "wagmi";
 import { shortenAddress } from "@/utils/addresses";
 import Image from "next/image";
 import CreateChannel from "@/components/CreateChannel";
 import { useReadTableLand } from "@/hook/useReadTableLand";
-import { useGetSubcriber } from "@/hook/usePush";
+import { useGetSubcriber, useSubcribe } from "@/hook/usePush";
 import { useWriteContract } from "@/hook/useWriteContract";
-import * as PushAPI from "@pushprotocol/restapi";
 
 const Profile: React.FC = () => {
   const router = useRouter()
   const { address } = router.query
-  const { data } = useReadTableLand("Channels");
-  const sub = useReadTableLand("Subscriptions");
+  const { data: channels } = useReadTableLand("Channels");
+  const { data: sub } = useReadTableLand("Subscriptions");
   const subcribers = useGetSubcriber()
   const { triggerSubscribe } = useWriteContract();
+  const { triggerOptin } = useSubcribe()
 
   const account = useAccount();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
@@ -43,58 +43,46 @@ const Profile: React.FC = () => {
 
   const currentChannel = useMemo(
     () => {
-      if(!data || !account) {return {}}
-      const fillter =  data.filter((data : any) => data.user_address.toLowerCase() === String(address).toLowerCase() )
+      if(!channels || !account) {return {}}
+      const fillter =  channels.filter((data : any) => data.user_address.toLowerCase() === String(address).toLowerCase() )
       return fillter[0]
     },
-    [data, account.address],
+    [channels, account.address],
   )
 
   const handleSubcribe = async () => {
-    // await triggerSubscribe(currentChannel.subscription_erc721_address);
-    // await PushAPI.channels.subscribe({
-    //   signer: ,
-    //   channelAddress: 'eip155:80001:0xD8634C39BBFd4033c0d3289C4515275102423681', // channel address in CAIP
-    //   userAddress: 'eip155:80001:0x52f856A160733A860ae7DC98DC71061bE33A28b3', // user address in CAIP
-    //   onSuccess: () => {
-    //    console.log('opt in success');
-    //   },
-    //   onError: (error) => {
-    //     console.error('opt in error',error);
-    //   },
-    //   env: 'staging'
-    // })
+    subcribers.data.subscribers.includes(String(account.address).toLocaleLowerCase()) || await triggerOptin()
+    await triggerSubscribe(currentChannel.subscription_erc721_address);
   }
+
+  const isProfile = useMemo(
+    () => {
+      if(!address || !account) {return false}
+      return String(address).toLowerCase() === String(account.address).toLowerCase()
+    },
+    [address, account.address],
+  )
 
   const isHaveChannel = useMemo(
     () => {
-      if(!data || !account) {return false}
-      const fillter =  data.filter((data : any) => data.user_address.toLowerCase() === String(account.address).toLowerCase() )
+      if(!channels || !address) {return false}
+      const fillter =  channels.filter((data : any) => data.user_address.toLowerCase() === String(address).toLowerCase() )
       return fillter.length === 1
     },
-    [data, account.address],
+    [channels, address],
   )
 
   const isSubscribed = useMemo(
     () => {
-      if(!sub.data || !account) {return false}
-      const fillter =  sub.data.filter((data : any) => (
+      if(!sub || !account) {return false}
+      const fillter =  sub.filter((data : any) => (
         data.subscriber_address.toLowerCase() === String(account.address).toLowerCase() &&
-        data.subscription_erc721_address.toLowerCase() === String(address).toLowerCase()
+        data.user_address.toLowerCase() === String(address).toLowerCase()
       ))
       return fillter.length === 1
     },
-    [sub.data, account.address, address],
+    [sub, account.address, address],
   )
-
-  // const isOptIn = useMemo(
-  //   () => {
-  //     if(!subcribers || !account) {return false}
-  //     const fillter =  subcribers.data.subscribers.filter((sub : string) => sub.toLowerCase() === String(account.address).toLowerCase() )
-  //     return fillter.length === 1
-  //   },
-  //   [subcribers.data, account.address],
-  // )
 
   return (
     <Layout>
@@ -103,21 +91,22 @@ const Profile: React.FC = () => {
           <div className="w-full bg-white overflow-hidden">
             <div className="flex justify-between">
               {address && <ProfileENS address={address as string}/> }
-              {isHaveChannel ||
                 <div className="flex items-end">
                   {
-                    account.address === address
-                    ? <CreateChannel isOpen={isCreateModalOpen} onOpen={()=>setIsCreateModalOpen(true)} onClose={()=>setIsCreateModalOpen(false)}/>
-                    : <button
-                      className="ml-auto bg-black text-white font-bold py-2 px-4 rounded"
-                      onClick={() => handleSubcribe()}
-                      disabled={!currentChannel.subscription_erc721_address}
-                      >
-                        {isSubscribed ? "Subscribed" : "Subscribe"}
+                    isProfile
+                    ?
+                      isHaveChannel || <CreateChannel isOpen={isCreateModalOpen} onOpen={()=>setIsCreateModalOpen(true)} onClose={()=>setIsCreateModalOpen(false)}/>
+                    :
+                      isHaveChannel &&
+                      <button
+                        className={`${isSubscribed ? "bg-transparent border-2 border-black" : "bg-black text-white "} ml-auto font-bold py-2 px-4 rounded-xl`}
+                        onClick={() => handleSubcribe()}
+                        disabled={isSubscribed}
+                        >
+                          {isSubscribed ? "Subscribed  😻" : "Subscribe 🤔"}
                       </button>
                   }
                 </div>
-              }
             </div>
             <hr className="my-4"/>
             <div className="p-4">
@@ -167,7 +156,7 @@ function ProfileENS({address}:{address: string}) {
   })
 
   const ensAvatar = useEnsAvatar({
-    name: data,
+    address: address as `0x${string}`,
     scopeKey: address as `0x${string}`,
     chainId: 1
   })

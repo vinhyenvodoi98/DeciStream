@@ -1,7 +1,7 @@
 import { getDefaultWallets, RainbowKitProvider } from '@rainbow-me/rainbowkit';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AppProps } from 'next/app';
-import { configureChains, createConfig, WagmiConfig } from 'wagmi';
+import { configureChains, createClient, WagmiConfig } from 'wagmi';
 import {
   arbitrum,
   foundry,
@@ -20,7 +20,7 @@ import '@rainbow-me/rainbowkit/styles.css';
 import { useIsSsr } from '../utils/ssr';
 import { createReactClient, studioProvider, LivepeerConfig , ThemeConfig} from '@livepeer/react';
 
-const { chains, publicClient, webSocketPublicClient } = configureChains(
+const { chains, provider } = configureChains(
   [
     mainnet,
     polygon,
@@ -39,11 +39,10 @@ const { connectors } = getDefaultWallets({
   chains,
 });
 
-const wagmiConfig = createConfig({
+const wagmiConfig = createClient({
   autoConnect: true,
   connectors,
-  publicClient,
-  webSocketPublicClient,
+  provider
 });
 
 const reactQueryClient = new QueryClient({
@@ -78,7 +77,7 @@ function MyApp({ Component, pageProps }: AppProps) {
 
   return (
     <div className='min-h-screen'>
-      <WagmiConfig config={wagmiConfig}>
+      <WagmiConfig client={wagmiConfig}>
         <RainbowKitProvider chains={chains}>
           <QueryClientProvider client={reactQueryClient}>
             <LivepeerConfig client={livepeerClient} theme={theme}>

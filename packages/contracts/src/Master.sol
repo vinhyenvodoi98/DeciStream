@@ -24,12 +24,11 @@ contract Master is Ownable {
 
   constructor() {
     string memory subscriptionsDb = "Subscriptions";
-    // Make sure we can get table_id back from calling `create`
     uint256 subscriptionsTableId = TablelandDeployments.get().create(
         address(this),
         SQLHelpers.toCreateFromSchema(
             "subscription_erc721_address text,"
-            "subscriber_address text," // Notice the trailing comma
+            "subscriber_address text,"
             "tokenId integer",
             subscriptionsDb
         )
@@ -37,7 +36,6 @@ contract Master is Ownable {
     _tables[subscriptionsDb] = subscriptionsTableId;
 
     string memory videosDb = "Videos";
-    // Make sure we can get table_id back from calling `create`
     uint256 videosTableId = TablelandDeployments.get().create(
         address(this),
         SQLHelpers.toCreateFromSchema(
@@ -50,11 +48,10 @@ contract Master is Ownable {
     _tables[videosDb] = videosTableId;
 
     string memory channels= "Channels";
-    // Make sure we can get table_id back from calling `create`
     uint256 channelsTableId = TablelandDeployments.get().create(
         address(this),
         SQLHelpers.toCreateFromSchema(
-            "user_address text," // Notice the trailing comma
+            "user_address text,"
             "subscription_erc721_address text,"
             "video_erc721_address text",
             channels

@@ -1,24 +1,41 @@
 import Link from "next/link"
 import Text from "../Text"
-import { useEnsAvatar, useEnsName } from 'wagmi'
+import { useAccount, useEnsAvatar, useEnsName } from 'wagmi'
 import { shortenAddress } from "@/utils/addresses"
 import Image from "next/image"
 import { useReadTableLand } from "@/hook/useReadTableLand"
 import { useMemo } from "react"
 
 export default function Streamers() {
-  const { data } = useReadTableLand("Channels");
+  const { data: channels } = useReadTableLand("Channels")
+  const { data: subscribedChannel } = useReadTableLand("Subscriptions")
+  const { address } = useAccount()
 
-  const channels = useMemo(() => {
-    if (!data) return []
-    return data.map((data : any) => data.user_address)
-  }, [data])
+  const subChannels = useMemo(() => {
+    if (!subscribedChannel) return []
+    return subscribedChannel.map((data : any) => data.user_address)
+  }, [subscribedChannel])
+
+  const otrChannels = useMemo(() => {
+    if (!channels || !subChannels || subChannels.length === 0 || !address) return []
+    return channels.filter((channel:any) => !subChannels.includes(channel.user_address) && address.toLocaleLowerCase() !== channel.user_address).map((data : any) => data.user_address)
+  }, [channels, subChannels, address])
 
   return (
-    <div className="py-6">
-      <Text content="Streamers" size='text-2xl'/>
-      <div className="py-6">
-        {channels.map((info: string) => <Streamer key={info} address={info} />)}
+    <div className="py-6 grid grid-rows-3 gap-4">
+      {subChannels.length > 0 &&
+        <div className="col-span">
+          <Text content="Subscribed 🍿" size='text-2xl'/>
+          <div className="py-6">
+            {subChannels.map((info: string) => <Streamer key={info} address={info} />)}
+          </div>
+        </div>
+      }
+      <div className="col-span-2">
+        <Text content="Channels 👀" size='text-2xl'/>
+        <div className="py-6">
+          {otrChannels.map((info: string) => <Streamer key={info} address={info} />)}
+        </div>
       </div>
     </div>
   )
@@ -32,7 +49,7 @@ function Streamer({address}: {address: string}) {
   })
 
   const ensAvatar = useEnsAvatar({
-    name: data,
+    address: address as `0x${string}`,
     scopeKey: address,
     chainId: 1
   })

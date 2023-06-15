@@ -19,6 +19,11 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'e0.pxfuel.com',
         port: '',
+      },
+      {
+        protocol: 'https',
+        hostname: 'gateway.ipfs.io',
+        port: '',
       }
     ],
   },
