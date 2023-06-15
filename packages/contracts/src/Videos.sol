@@ -5,15 +5,17 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
-import "@tableland/evm/contracts/utils/TablelandDeployments.sol";
-import "@tableland/evm/contracts/utils/SQLHelpers.sol";
+import "./Master.sol";
 
 contract Videos is ERC721, ERC721URIStorage, Ownable {
   using Counters for Counters.Counter;
   mapping (string => uint256) private _tables;
   Counters.Counter private _tokenIdCounter;
+  address private _masterAddress;
 
-  constructor(string memory name, string memory symbol) ERC721(name, symbol) {}
+  constructor(string memory name, string memory symbol) ERC721(name, symbol) {
+    _masterAddress = msg.sender;
+  }
 
   function safeMint(address to, string memory uri) public onlyOwner {
     uint256 tokenId = _tokenIdCounter.current();
@@ -21,22 +23,7 @@ contract Videos is ERC721, ERC721URIStorage, Ownable {
     _safeMint(to, tokenId);
     _setTokenURI(tokenId, uri);
 
-    TablelandDeployments.get().mutate(
-      address(this),
-      _tables["Videos"],
-      SQLHelpers.toInsert(
-        "Videos",
-        _tables["Videos"],
-        "video_erc721_address,owner_address,tokenId",
-        string.concat(
-          SQLHelpers.quote(Strings.toHexString(address(this))),
-          ",",
-          SQLHelpers.quote(Strings.toHexString(address(msg.sender))),
-          ",",
-          Strings.toString(tokenId)
-        )
-      )
-    );
+    Master(_masterAddress).insertVideo(address(this), msg.sender, tokenId);
   }
 
   // The following functions are overrides required by Solidity.
@@ -70,27 +57,6 @@ contract Videos is ERC721, ERC721URIStorage, Ownable {
   function _transfer(address from, address to, uint256 tokenId) internal override virtual {
     super._transfer(from, to, tokenId);
 
-    string memory setters = string.concat(
-      "owner_address=",
-      SQLHelpers.quote(Strings.toHexString(to)) // Wrap strings in single quotes
-    );
-
-    string memory filters = string.concat(
-      "video_erc721_address=",
-      SQLHelpers.quote(Strings.toHexString(address(this))),
-      "and tokenId=",
-      Strings.toString(tokenId)
-    );
-
-    TablelandDeployments.get().mutate(
-      address(this),
-      _tables["Videos"],
-      SQLHelpers.toUpdate(
-        "Videos",
-        _tables["Videos"],
-        setters,
-        filters
-      )
-    );
+    Master(_masterAddress).updateVideo(address(this), to, tokenId);
   }
 }

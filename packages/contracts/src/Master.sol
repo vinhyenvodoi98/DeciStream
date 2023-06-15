@@ -9,6 +9,18 @@ import "@tableland/evm/contracts/utils/TablelandDeployments.sol";
 
 contract Master is Ownable {
   mapping (string => uint256) private _tables;
+  mapping (address => bool) private _subcriptionsAddresses;
+  mapping (address => bool) private _videosAddresses;
+
+  modifier onlySubcriptions() {
+    require(_subcriptionsAddresses[msg.sender], "Caller is not subcriptions");
+    _;
+  }
+
+  modifier onlyVideos() {
+    require(_videosAddresses[msg.sender], "Caller is not videos");
+    _;
+  }
 
   constructor() {
     string memory subscriptionsDb = "Subscriptions";
@@ -54,9 +66,11 @@ contract Master is Ownable {
   function createChannel(string memory name, string memory symbol, string memory uri) external {
     Subcriptions sub = new Subcriptions(name, symbol, uri);
     sub.transferOwnership(msg.sender);
+    _subcriptionsAddresses[address(sub)] = true;
 
     Videos video = new Videos(name, symbol);
     video.transferOwnership(msg.sender);
+    _subcriptionsAddresses[address(video)] = true;
 
     TablelandDeployments.get().mutate(
       address(this),
@@ -72,6 +86,94 @@ contract Master is Ownable {
           ",",
           SQLHelpers.quote(Strings.toHexString(address(video)))
         )
+      )
+    );
+  }
+
+  function insertSubcription(address erc721contract, address subscriberAddress ,uint256 newTokenId) external onlySubcriptions {
+    TablelandDeployments.get().mutate(
+      address(this),
+      _tables["Subscriptions"],
+      SQLHelpers.toInsert(
+        "Subscriptions",
+        _tables["Subscriptions"],
+        "subscription_erc721_address,subscriber_address,tokenId",
+        string.concat(
+          SQLHelpers.quote(Strings.toHexString(erc721contract)),
+          ",",
+          SQLHelpers.quote(Strings.toHexString(subscriberAddress)),
+          ",",
+          Strings.toString(newTokenId)
+        )
+      )
+    );
+  }
+
+  function updateSubcription(address erc721contract, address to, uint256 tokenId) external onlySubcriptions {
+    string memory setters = string.concat(
+      "subscriber_address=",
+      SQLHelpers.quote(Strings.toHexString(to)) // Wrap strings in single quotes
+    );
+
+    string memory filters = string.concat(
+      "subscription_erc721_address=",
+      SQLHelpers.quote(Strings.toHexString(erc721contract)),
+      "and tokenId=",
+      Strings.toString(tokenId)
+    );
+
+    TablelandDeployments.get().mutate(
+      address(this),
+      _tables["Subscriptions"],
+      SQLHelpers.toUpdate(
+        "Subscriptions",
+        _tables["Subscriptions"],
+        setters,
+        filters
+      )
+    );
+  }
+
+  function insertVideo(address erc721contract, address ownerAddress, uint256 newTokenId) external onlyVideos {
+    TablelandDeployments.get().mutate(
+      address(this),
+      _tables["Videos"],
+      SQLHelpers.toInsert(
+        "Videos",
+        _tables["Videos"],
+        "video_erc721_address,owner_address,tokenId",
+        string.concat(
+          SQLHelpers.quote(Strings.toHexString(erc721contract)),
+          ",",
+          SQLHelpers.quote(Strings.toHexString(ownerAddress)),
+          ",",
+          Strings.toString(newTokenId)
+        )
+      )
+    );
+  }
+
+  function updateVideo(address erc721contract, address to, uint256 tokenId) external onlyVideos {
+    string memory setters = string.concat(
+      "owner_address=",
+      SQLHelpers.quote(Strings.toHexString(to)) // Wrap strings in single quotes
+    );
+
+    string memory filters = string.concat(
+      "video_erc721_address=",
+      SQLHelpers.quote(Strings.toHexString(erc721contract)),
+      "and tokenId=",
+      Strings.toString(tokenId)
+    );
+
+    TablelandDeployments.get().mutate(
+      address(this),
+      _tables["Videos"],
+      SQLHelpers.toUpdate(
+        "Videos",
+        _tables["Videos"],
+        setters,
+        filters
       )
     );
   }
