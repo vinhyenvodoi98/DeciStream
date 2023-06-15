@@ -33,7 +33,7 @@ export function useReadTableLand(table:string) {
     queryFn: () => {
       return fetchChannelsData(table);
     },
-    refetchInterval: 7500,
+    refetchInterval: 10500,
   });
 
   return { isLoading, hasError, data };

@@ -4,14 +4,14 @@ import Layout from '@/components/layout/Layout';
 
 import PodCastDaos from '@/components/PodCastDaos';
 import CurrentSteams from '@/components/CurrentSteams';
-import Podcasters from '@/components/Podcasters';
+import Streamers from '@/components/Streamers';
 
 export default function HomePage() {
   return (
     <Layout>
       <div className='grid grid-cols-6 gap-4lex'>
         <div>
-          <Podcasters />
+          <Streamers />
         </div>
         <div className='col-span-5'>
           <PodCastDaos />

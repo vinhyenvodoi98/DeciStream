@@ -2,17 +2,19 @@ import { CheckIcon, CopyIcon } from "@/components/Icon";
 import { useRouter } from 'next/router'
 import Layout from "@/components/layout/Layout";
 import Text from "@/components/Text";
-import React, { useEffect, useState } from "react";
-import { useAccount, useEnsAvatar, useEnsName, useWalletClient } from "wagmi";
+import React, { useEffect, useMemo, useState } from "react";
+import { useAccount, useEnsAvatar, useEnsName } from "wagmi";
 import { shortenAddress } from "@/utils/addresses";
 import Image from "next/image";
 import * as PushAPI from "@pushprotocol/restapi";
 import CreateChannel from "@/components/CreateChannel";
+import { useReadTableLand } from "@/hook/useReadTableLand";
 
 const Profile: React.FC = () => {
   const router = useRouter()
   const { address } = router.query
-  const { data: walletClient, isError, isLoading } = useWalletClient()
+  const { data } = useReadTableLand("Channels");
+
   const account = useAccount();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
 
@@ -59,6 +61,14 @@ const Profile: React.FC = () => {
     //   env: 'staging'
     // })
   }
+  const isHaveChannel = useMemo(
+    () => {
+      if(!data || !account) {return false}
+      const fillter =  data.filter((data : any) => data.user_address.toLowerCase() === String(account.address).toLowerCase() )
+      return fillter.length === 1
+    },
+    [data, account.address],
+  )
 
   const chandleCeateChannel = async () => {
     console.log("create channel")
@@ -71,24 +81,20 @@ const Profile: React.FC = () => {
           <div className="w-full bg-white overflow-hidden">
             <div className="flex justify-between">
               {address && <ProfileENS address={address as string}/> }
-              <div className="flex items-center">
-                {
-                  account.address === address
-                  ? <CreateChannel isOpen={isCreateModalOpen} onOpen={()=>setIsCreateModalOpen(true)} onClose={()=>setIsCreateModalOpen(false)}/>
-                  // ? <button
-                  //   className="ml-auto bg-black text-white font-bold py-2 px-4 rounded"
-                  //   onClick={() => chandleCeateChannel()}
-                  //   >
-                  //     Create Channel
-                  //   </button>
-                  : <button
-                    className="ml-auto bg-black text-white font-bold py-2 px-4 rounded"
-                    onClick={() => handleSubcribe()}
-                    >
-                      Subscribe
-                    </button>
-                }
-              </div>
+              {isHaveChannel ||
+                <div className="flex items-center">
+                  {
+                    account.address === address
+                    ? <CreateChannel isOpen={isCreateModalOpen} onOpen={()=>setIsCreateModalOpen(true)} onClose={()=>setIsCreateModalOpen(false)}/>
+                    : <button
+                      className="ml-auto bg-black text-white font-bold py-2 px-4 rounded"
+                      onClick={() => handleSubcribe()}
+                      >
+                        Subscribe
+                      </button>
+                  }
+                </div>
+              }
             </div>
             <hr className="my-4"/>
             <div className="p-4">
