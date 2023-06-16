@@ -10,7 +10,6 @@ contract Subcriptions is ERC721, Ownable {
   using Counters for Counters.Counter;
   Counters.Counter private _tokenId;
   string private _customBaseURI;
-  mapping (string => uint256) private _tables;
   address private _masterAddress;
 
   constructor(string memory name, string memory symbol, string memory customBaseURI_) ERC721(name, symbol) {
@@ -24,6 +23,7 @@ contract Subcriptions is ERC721, Ownable {
     _tokenId.increment();
 
     Master(_masterAddress).insertSubcription(address(this), msg.sender, newTokenId);
+    Master(_masterAddress).newSubsribeNotify(owner(), msg.sender);
   }
 
   function _baseURI() internal override view virtual returns (string memory) {
@@ -34,10 +34,6 @@ contract Subcriptions is ERC721, Ownable {
     _requireMinted(tokenId);
 
     return _baseURI();
-  }
-
-  function updateTable(string memory tablePrefix, uint256 tableId) public onlyOwner {
-    _tables[tablePrefix] = tableId;
   }
 
   function _transfer(address from, address to, uint256 tokenId) internal override virtual {

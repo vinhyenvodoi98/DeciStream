@@ -32,7 +32,7 @@ export default function Streamers() {
         </div>
       }
       <div className="col-span-2">
-        <Text content="Channels 👀" size='text-2xl'/>
+        <Text content="Discover 👀" size='text-2xl'/>
         <div className="py-6">
           {otrChannels.map((info: string) => <Streamer key={info} address={info} />)}
         </div>

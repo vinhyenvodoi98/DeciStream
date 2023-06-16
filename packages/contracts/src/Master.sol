@@ -7,10 +7,16 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@tableland/evm/contracts/utils/SQLHelpers.sol";
 import "@tableland/evm/contracts/utils/TablelandDeployments.sol";
 
+interface IPUSHCommInterface {
+    function sendNotification(address _channel, address _recipient, bytes calldata _identity) external;
+}
+
 contract Master is Ownable {
   mapping (string => uint256) private _tables;
   mapping (address => bool) private _subcriptionsAddresses;
   mapping (address => bool) private _videosAddresses;
+  address private _epnsAddress = 0xb3971BCef2D791bc4027BbfedFb47319A4AAaaAa;
+  address private _epnsChannel = 0xdA0AE9002cE609F8707f4Cb5D45704b7aAa78624;
 
   modifier onlySubcriptions() {
     require(_subcriptionsAddresses[msg.sender], "Caller is not subcriptions");
@@ -173,6 +179,32 @@ contract Master is Ownable {
         filters
       )
     );
+  }
+
+  function newSubsribeNotify(address to, address subscriber) external onlySubcriptions {
+    IPUSHCommInterface(_epnsAddress).sendNotification(
+      _epnsChannel, // from channel
+      to, // to recipient, put address(this) in case you want Broadcast or Subset. For Targetted put the address to which you want to send
+      bytes(
+        string(
+          // We are passing identity here: https://docs.epns.io/developers/developer-guides/sending-notifications/advanced/notification-payload-types/identity/payload-identity-implementations
+          abi.encodePacked(
+              "0", // this is notification identity: https://docs.epns.io/developers/developer-guides/sending-notifications/advanced/notification-payload-types/identity/payload-identity-implementations
+              "+", // segregator
+              "3", // this is payload type: https://docs.epns.io/developers/developer-guides/sending-notifications/advanced/notification-payload-types/payload (1, 3 or 4) = (Broadcast, targetted or subset)
+              "+", // segregator
+              "New Subscriber!", // this is notificaiton title
+              "+", // segregator
+              Strings.toHexString(subscriber),
+              " subscribed you !" // notification body
+          )
+        )
+      )
+    );
+  }
+
+  function newVideoNotify() external onlySubcriptions {
+
   }
 
   function getTableId (string memory name) public view onlyOwner returns (uint256) {

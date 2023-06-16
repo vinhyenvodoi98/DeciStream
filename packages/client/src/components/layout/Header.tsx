@@ -12,7 +12,7 @@ export default function Header() {
     <header className='top-0 z-50 bg-white'>
       <div className='flex h-20 items-center justify-between'>
         <Link href="/" className='flex items-center pr-6'>
-          <Text content="ĐeciPodCast" size='text-2xl'/>
+          <Text content="ĐeciStreams" size='text-2xl'/>
         </Link>
         <div className='flex'>
           <Link href="/planning" className='flex items-center pr-6'>

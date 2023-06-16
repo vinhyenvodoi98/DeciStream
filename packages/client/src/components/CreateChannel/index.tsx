@@ -1,7 +1,9 @@
+import { useGetSubcriber, useSubcribe } from '@/hook/usePush';
 import { useUploadImage } from '@/hook/useUploadNFTStorage';
 import { useWriteContract } from '@/hook/useWriteContract';
 import { useState } from 'react';
 import { useDropzone } from 'react-dropzone';
+import { useAccount } from 'wagmi';
 import Text from '../Text';
 
 interface ModalProps {
@@ -11,12 +13,17 @@ interface ModalProps {
 }
 
 const CreateChannel: React.FC<ModalProps> = ({ isOpen, onOpen, onClose }) => {
+  const subcribers = useGetSubcriber()
   const [name, setName] = useState('');
   const [symbol, setSymbol] = useState('');
   const [image, setImage] = useState<File | null>(null);
   const { triggerMasterTransactions } = useWriteContract()
+  const { address } = useAccount();
+  const { triggerOptin } = useSubcribe()
 
   const handleSubmit = async (e: React.FormEvent) => {
+    console.log(subcribers.data)
+    subcribers.data.subscribers.includes(String(address).toLocaleLowerCase()) || await triggerOptin()
     if(image) {
       e.preventDefault();
       const channelImage = await useUploadImage(image)
@@ -26,7 +33,7 @@ const CreateChannel: React.FC<ModalProps> = ({ isOpen, onOpen, onClose }) => {
   };
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    accept: 'image/*',
+    accept: 'image/*' as any,
     onDrop: (acceptedFiles) => {
       setImage(acceptedFiles[0]);
     },
@@ -35,7 +42,7 @@ const CreateChannel: React.FC<ModalProps> = ({ isOpen, onOpen, onClose }) => {
   return (
     <div>
       <button
-        className="ml-auto bg-black text-white font-bold py-2 px-4 rounded"
+        className="ml-auto bg-black text-white font-bold py-2 px-4 rounded-xl"
         onClick={onOpen}
       >
         Create Channel

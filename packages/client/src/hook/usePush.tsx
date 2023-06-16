@@ -57,7 +57,13 @@ async function fetchNotifications(address: string): Promise<any> {
     user: `eip155:80001:${address}`, // user address in CAIP
     env: 'staging' as ENV,
   });
-  return spams.filter((spam:any) => spam.app === "DeciPodcast").map((feed:any) => feed.notification);
+  return spams.filter((spam:any) => spam.app === "DeciPodcast").map((feed:any) => {
+    return {
+      title: feed.title,
+      body: feed.notification.body,
+      sid: feed.sid
+    }
+  });
 }
 
 export function useSubcribe() {
