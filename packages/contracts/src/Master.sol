@@ -203,6 +203,26 @@ contract Master is Ownable {
     );
   }
 
+  function inviteNotify(address to, string memory inviteLink) external {
+    IPUSHCommInterface(_epnsAddress).sendNotification(
+      _epnsChannel,
+      to,
+      bytes(
+        string(
+          abi.encodePacked(
+              "0",
+              "+",
+              "3",
+              "+",
+              "Stream invitation !",
+              "+",
+              inviteLink
+          )
+        )
+      )
+    );
+  }
+
   function newVideoNotify() external onlySubcriptions {
 
   }

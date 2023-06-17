@@ -22,7 +22,7 @@ export default function PodCastDaos () {
 
   return (
     <div className="py-6">
-      <Text content='PodCast Dao Zone' size='text-2xl' />
+      <Text content='Stream Dao Zone' size='text-2xl' />
       <div className="relative py-6 grid grid-cols-5 gap-6">
         {travelDaos.map(travleDao => <DaoLabel key={travleDao} id={travleDao}/>)}
       </div>

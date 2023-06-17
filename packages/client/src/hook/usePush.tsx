@@ -60,7 +60,7 @@ async function fetchNotifications(address: string): Promise<any> {
   return spams.filter((spam:any) => spam.app === "DeciPodcast").map((feed:any) => {
     return {
       title: feed.title,
-      body: feed.notification.body,
+      body: feed.message,
       sid: feed.sid
     }
   });

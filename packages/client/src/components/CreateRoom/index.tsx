@@ -1,18 +1,31 @@
 import useLivePeer from "@/hook/useLivePeer";
+import { useReadTableLand } from "@/hook/useReadTableLand";
+import { useWriteContract } from "@/hook/useWriteContract";
+import { shortenAddress } from "@/utils/addresses";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useAccount } from "wagmi";
 import Text from "../Text";
+import DropdownInput from "./DrowdownInput";
 
 export default function CreateRoom () {
   const { address } = useAccount()
   const router = useRouter();
-  const [inviteeAddress, setInviteeAdress] = useState('');
+  const [inviteeAddress, setInviteeAdress] = useState<any>(null);
   const [roomId, setRoomId] = useState('')
   const { useCreate, useInvite, useClose ,useCloseStream, useOpenStream } = useLivePeer()
-  const handleChange = (event: any) => {
-    setInviteeAdress(event.target.value);
-  };
+  const { triggerInviteNoti } = useWriteContract()
+  const { data: channel } = useReadTableLand("Channels")
+
+  const channelOptions = useMemo(() => {
+    if (!channel) return []
+    return channel.map((c:any) => {
+      return {
+        value: c.user_address,
+        label: shortenAddress(c.user_address)
+      }
+    })
+  }, [channel])
 
   const handleCreate = async () => {
     console.log("create")
@@ -24,10 +37,9 @@ export default function CreateRoom () {
   }
 
   const handleInvite = async () => {
-    if (inviteeAddress.trim() !== '') {
-      console.log(address)
-      const data = await useInvite(roomId, inviteeAddress)
-      console.log(data)
+    if (inviteeAddress)  {
+      const data = await useInvite(roomId, inviteeAddress.value)
+      await triggerInviteNoti(inviteeAddress.value, data.joinUrl.slice(64)) // because push limit 500 words
       setInviteeAdress('');
     }
   }
@@ -59,17 +71,13 @@ export default function CreateRoom () {
           Create
         </button>
       </div>
-      <div className="flex">
-        <input
-            type="text"
-            value={inviteeAddress}
-            onChange={handleChange}
-            placeholder="Input address or ENS"
-            className="flex-grow p-2 border mr-2 border-gray-300 rounded"
-          />
-          <button
+      <div className="grid grid-cols-7 h-10 gap-4">
+        <div className="col-span-5">
+          <DropdownInput opt={channelOptions} inviteeAddress={inviteeAddress} setInviteeAdress={(inviteeAddress) => setInviteeAdress(inviteeAddress)}/>
+        </div>
+        <button
             onClick={()=>handleInvite()}
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded col-span-2">
             Invite
           </button>
       </div>

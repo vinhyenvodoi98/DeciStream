@@ -3,7 +3,7 @@ import { useRouter } from 'next/router'
 import Layout from "@/components/layout/Layout";
 import Text from "@/components/Text";
 import { useMemo, useState } from "react";
-import { useAccount, useSigner, useEnsAvatar, useEnsName } from "wagmi";
+import { useAccount, useEnsAvatar, useEnsName } from "wagmi";
 import { shortenAddress } from "@/utils/addresses";
 import Image from "next/image";
 import CreateChannel from "@/components/CreateChannel";

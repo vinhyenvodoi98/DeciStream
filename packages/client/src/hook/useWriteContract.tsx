@@ -46,9 +46,30 @@ export function useWriteContract() {
     [setIsLoading]
   );
 
+  const triggerInviteNoti = useCallback(
+    async (to: string, inviteLink: string) => {
+      setIsLoading(true);
+      console.log(to, inviteLink)
+      try {
+        const { hash } = await writeContract({
+          mode: "recklesslyUnprepared",
+          address: DeployedContract.deployedTo as `0x${string}`,
+          abi: MasterAbi.abi,
+          functionName: "inviteNotify",
+          args: [to, inviteLink],
+        });
+      } catch (error) {
+        console.log(error)
+      }
+      setIsLoading(false);
+    },
+    [setIsLoading]
+  );
+
   return {
     isLoading,
     triggerMasterTransactions,
     triggerSubscribe,
+    triggerInviteNoti
   };
 }

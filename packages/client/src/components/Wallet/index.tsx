@@ -2,11 +2,10 @@ import { ConnectButton } from '@rainbow-me/rainbowkit';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
-import { LogoutIcon, ProfileIcon } from '../Icon';
 
 const Wallet = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const dropdownRef = useRef(null);
+  const dropdownRef = useRef<any>(null);
 
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
@@ -141,7 +140,7 @@ const Wallet = () => {
                           role="menu"
                           aria-orientation="vertical"
                           aria-labelledby="dropdown-menu-button"
-                          tabIndex="-1"
+                          tabIndex={"-1" as any}
                         >
                           <Link href={`/profile/${account.address}`} className='flex px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900'>
                             <p className='ml-4'>Profile</p>
