@@ -1,6 +1,6 @@
 <h1 align="center">DeciStream 👋</h1>
 <p>
-  <!-- <img src="" /> -->
+  <img src="https://github.com/vinhyenvodoi98/DeciStream/blob/master/images/cover.png" />
 </p>
 
 # Description
@@ -30,6 +30,8 @@ DeciStream focuses on decentralized values. For example, each channel is an erc7
 I use /room and /stream feature to be able to create multi-participant streams
 
 ## Database ( [tableLand](https://tableland.xyz/) )
+
+<img src="https://github.com/vinhyenvodoi98/DeciStream/blob/master/images/database.png" />
 
 I use 4 tables namely Channels, Steams, Videos, Subscriptions.
 - The Channels table will store the user's address and the address of the smartcontract video and subscription.
