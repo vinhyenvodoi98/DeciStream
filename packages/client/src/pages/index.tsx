@@ -2,7 +2,6 @@ import * as React from 'react';
 
 import Layout from '@/components/layout/Layout';
 
-import PodCastDaos from '@/components/PodCastDaos';
 import CurrentSteams from '@/components/CurrentSteams';
 import Streamers from '@/components/Streamers';
 
@@ -14,7 +13,7 @@ export default function HomePage() {
           <Streamers />
         </div>
         <div className='col-span-5'>
-          <PodCastDaos />
+          {/* <PodCastDaos /> */}
           <CurrentSteams />
         </div>
       </div>

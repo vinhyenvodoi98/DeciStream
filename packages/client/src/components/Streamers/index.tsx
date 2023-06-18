@@ -17,7 +17,7 @@ export default function Streamers() {
   }, [subscribedChannel, address])
 
   const otrChannels = useMemo(() => {
-    if ( channels && subChannels.length === 0 && subscribedChannel) return subscribedChannel.filter((sub:any) => sub.user_address !== String(address).toLocaleLowerCase()).map((data : any) => data.user_address)
+    if (!!channels && subChannels.length === 0 && !!subscribedChannel) return channels.filter((sub:any) => sub.user_address !== String(address).toLocaleLowerCase()).map((data : any) => data.user_address)
     if (!channels || !subChannels || !address) return []
     return channels.filter((channel:any) => !subChannels.includes(channel.user_address) && address.toLocaleLowerCase() !== channel.user_address).map((data : any) => data.user_address)
   }, [channels, subscribedChannel, subChannels, address])

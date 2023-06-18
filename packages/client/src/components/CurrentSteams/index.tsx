@@ -12,7 +12,7 @@ const imageExample = "https://e0.pxfuel.com/wallpapers/572/94/desktop-wallpaper-
 export default function CurrentSteams () {
   const { data: streams } = useReadTableLand("Streams")
   return (
-    <div>
+    <div className="py-6">
       <Text content='Streams of the day' size='text-2xl' />
         <div className="relative py-6 grid grid-cols-4 gap-6">
         {streams && streams.map((stream:any) => <Video key={stream.streamId} streamId={stream.streamId} topic={stream.topic} playbackId={stream.playbackId} host={stream.user_address}/>)}

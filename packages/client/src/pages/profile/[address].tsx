@@ -84,7 +84,7 @@ const Profile: React.FC = () => {
   )
 
   const ownedVideos = useMemo(() => {
-    if(!videoNft || !account) {return 0}
+    if(!videoNft || !account) {return []}
       const fillter =  videoNft.filter((data : any) => (
         data.owner_address.toLowerCase() === String(address).toLowerCase()
       ))
@@ -125,7 +125,7 @@ const Profile: React.FC = () => {
             <div className="p-4">
               <Text content="Video" size='text-2xl'/>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mt-4">
-                {videoNft && videoNft.map((video: any, id: number) => (
+                {ownedVideos.map((video: any, id: number) => (
                   <ProfileVideo video={video} key={id}/>
                 ))}
               </div>

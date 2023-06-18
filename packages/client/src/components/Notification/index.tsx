@@ -93,7 +93,7 @@ const Notification = () => {
       </button>
 
       {isOpen && (
-        <div className="origin-top-right z-10 absolute right-0 mt-2 w-96 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+        <div className="origin-top-right z-10 absolute right-0 mt-2 w-96 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 max-h-96 overflow-auto">
           <div className="py-1 divide-y divide-dashed" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
             {
               filteredData.map((noti:any, id: number) =>
