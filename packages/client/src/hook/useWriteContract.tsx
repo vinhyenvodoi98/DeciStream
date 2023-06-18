@@ -4,6 +4,7 @@ import { useCallback, useState } from 'react';
 import DeployedContract from '../../../contracts/contractInfo.json';
 import MasterAbi from '../../../contracts/out/Master.sol/Master.json';
 import SubcriptionsAbi from '../../../contracts/out/Subcriptions.sol/Subcriptions.json';
+import VideoAbi from '../../../contracts/out/Videos.sol/Videos.json';
 
 export function useWriteContract() {
   const [isLoading, setIsLoading] = useState(false);
@@ -19,7 +20,7 @@ export function useWriteContract() {
           functionName: functionName,
           args: params || [],
         });
-        const data = await waitForTransaction({
+        await waitForTransaction({
           hash
         })
       } catch (error) {
@@ -41,7 +42,29 @@ export function useWriteContract() {
           functionName: "mint",
           args: [],
         });
-        const data = await waitForTransaction({
+        await waitForTransaction({
+          hash
+        })
+      } catch (error) {
+        console.log(error)
+      }
+      setIsLoading(false);
+    },
+    [setIsLoading]
+  );
+
+  const triggerMigrateVideo = useCallback(
+    async (contractAddress: string, uri: string) => {
+      setIsLoading(true);
+      try {
+        const { hash } = await writeContract({
+          mode: "recklesslyUnprepared",
+          address: contractAddress as `0x${string}`,
+          abi: VideoAbi.abi,
+          functionName: "safeMint",
+          args: [uri],
+        });
+        await waitForTransaction({
           hash
         })
       } catch (error) {
@@ -85,7 +108,7 @@ export function useWriteContract() {
           functionName: "createStream",
           args: [topic, playbackId, streamId],
         });
-        const data = await waitForTransaction({
+        await waitForTransaction({
           hash
         })
       } catch (error) {
@@ -100,6 +123,7 @@ export function useWriteContract() {
     isLoading,
     triggerMasterTransactions,
     triggerSubscribe,
+    triggerMigrateVideo,
     triggerInviteNoti,
     triggerCreateStream
   };

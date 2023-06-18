@@ -1,11 +1,13 @@
 import useLivePeer from "@/hook/useLivePeer";
 import { useReadTableLand } from "@/hook/useReadTableLand";
+import { useUploadMetadata } from "@/hook/useUploadNFTStorage";
 import { useWriteContract } from "@/hook/useWriteContract";
 import { shortenAddress } from "@/utils/addresses";
 import { useCreateStream } from "@livepeer/react";
 import { useRouter } from "next/router";
 import { useEffect, useMemo, useState } from "react";
 import { useAccount } from "wagmi";
+import { SmallSpinner } from "../Icon";
 import Loading from "../Loading";
 import Text from "../Text";
 import DropdownInput from "./DrowdownInput";
@@ -16,13 +18,34 @@ export default function CreateRoom () {
   const [inviteeAddress, setInviteeAdress] = useState<any>(null);
   const [roomId, setRoomId] = useState('')
   const [topic, setTopic] = useState('')
-  const { isLoading: liveLoading ,useCreate, useInvite, useClose ,useCloseStream, useOpenStream } = useLivePeer()
-  const { isLoading, triggerInviteNoti, triggerCreateStream} = useWriteContract()
+  const [streamId, setStreamId] = useState<null | string>(null)
+  const [recordSessions, setRecordSessions] = useState<any>(null)
+  const { isLoading: liveLoading ,useCreate, useInvite, useClose ,useCloseStream, useOpenStream, useGetRecord } = useLivePeer()
+  const { isLoading, triggerInviteNoti, triggerCreateStream, triggerMigrateVideo } = useWriteContract()
   const { data: channel } = useReadTableLand("Channels")
 
   const {
     mutateAsync: createStream,
-  } = useCreateStream({ name: address as string });
+  } = useCreateStream({
+    name: address as string,
+    record: true
+  });
+
+  useEffect(() => {
+    const fetchRecord = async () => {
+      if(streamId){
+        const recordSession = await useGetRecord(streamId)
+        setRecordSessions(recordSession[0])
+      }
+    }
+    const interval = setInterval(() => {
+      fetchRecord()
+    }, 7000);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [streamId])
 
   const channelOptions = useMemo(() => {
     if (!channel) return []
@@ -33,6 +56,12 @@ export default function CreateRoom () {
       }
     })
   }, [channel])
+
+  const channelVideoContract = useMemo(() => {
+    if (!channel) return null
+    const x = channel.filter((data:any) => data.user_address === String(address).toLocaleLowerCase())[0]
+    return x ? x.video_erc721_address : null
+  }, [channel, address])
 
   useEffect(() => {
     if(router.query.roomId) setRoomId(router.query.roomId as string)
@@ -61,7 +90,13 @@ export default function CreateRoom () {
     if(stream){
       await triggerCreateStream(topic, stream.playbackId, stream.id)
       await useOpenStream(roomId, stream.id as string)
+      setStreamId(stream.id)
     }
+  }
+
+  const handleMigrateVideo = async () => {
+    const metadata = await useUploadMetadata({name: topic, image: recordSessions.mp4Url})
+    await triggerMigrateVideo(channelVideoContract, metadata)
   }
 
   const handleCloseStream = async () => {
@@ -124,6 +159,12 @@ export default function CreateRoom () {
           Close
         </button>
       </div>
+      <button
+        onClick={() => handleMigrateVideo()}
+        className={`bg-blue-500 text-white font-bold py-2 px-4 rounded ${!(!recordSessions || recordSessions.recordingStatus !== 'ready') && 'hover:bg-blue-700'}`}
+        disabled={!recordSessions || recordSessions.recordingStatus !== 'ready'}>
+          {(recordSessions && recordSessions.recordingStatus === 'waiting') ? <div>Record <SmallSpinner /></div> : <div>Mint Video NFT</div>}
+      </button>
     </div>
   )
 }

@@ -107,10 +107,24 @@ const useLivePeer = () => {
     } catch (error) {
       setIsLoading(false)
       console.log('Failed to get healthy', error);
+      return { isActive: false}
     }
   };
 
-  return { isLoading, useCreate, useInvite, useClose ,useCloseStream, useOpenStream, useIsHealthy };
+  const useGetRecord = async (id: string) => {
+    try {
+      const response = await axios.get(`https://livepeer.studio/api/stream/${id}/sessions`, {
+        headers: {
+          Authorization: `Bearer ${process.env.NEXT_PUBLIC_STUDIO_API_KEY}`,
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.log('Failed to get record', error);
+    }
+  };
+
+  return { isLoading, useCreate, useInvite, useClose ,useCloseStream, useOpenStream, useIsHealthy, useGetRecord };
 };
 
 export default useLivePeer;

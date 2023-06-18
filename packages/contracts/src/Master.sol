@@ -92,7 +92,7 @@ contract Master is Ownable {
 
     Videos video = new Videos(name, symbol);
     video.transferOwnership(msg.sender);
-    _subcriptionsAddresses[address(video)] = true;
+    _videosAddresses[address(video)] = true;
 
     _usersAddresses[msg.sender] = true;
 

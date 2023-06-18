@@ -30,13 +30,13 @@ export default function Live() {
               </div>
           }
         </div>
-        <div className="h-full grid grid-rows-3 grid-flow-col gap-4">
+        <div className="h-full grid grid-rows-5 grid-flow-col gap-4">
           { roomOwner &&
-            <div className="rounded-xl shadow">
+            <div className="rounded-xl shadow row-span-2">
               <CreateRoom/>
             </div>
           }
-          <div className={`rounded-xl shadow ${roomOwner ? 'row-span-2' : 'row-span-3'}`}>
+          <div className={`rounded-xl shadow ${roomOwner ? 'row-span-3' : 'row-span-5'}`}>
             <Comments />
           </div>
         </div>

@@ -17,10 +17,10 @@ contract Videos is ERC721, ERC721URIStorage, Ownable {
     _masterAddress = msg.sender;
   }
 
-  function safeMint(address to, string memory uri) public onlyOwner {
+  function safeMint(string memory uri) public onlyOwner {
     uint256 tokenId = _tokenIdCounter.current();
     _tokenIdCounter.increment();
-    _safeMint(to, tokenId);
+    _safeMint(msg.sender, tokenId);
     _setTokenURI(tokenId, uri);
 
     Master(_masterAddress).insertVideo(address(this), msg.sender, tokenId);

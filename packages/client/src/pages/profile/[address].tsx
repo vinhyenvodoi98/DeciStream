@@ -2,7 +2,7 @@ import { CheckIcon, CopyIcon } from "@/components/Icon";
 import { useRouter } from 'next/router'
 import Layout from "@/components/layout/Layout";
 import Text from "@/components/Text";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useAccount, useEnsAvatar, useEnsName } from "wagmi";
 import { shortenAddress } from "@/utils/addresses";
 import Image from "next/image";
@@ -11,36 +11,22 @@ import { useReadTableLand } from "@/hook/useReadTableLand";
 import { useGetSubcriber, useSubcribe } from "@/hook/usePush";
 import { useWriteContract } from "@/hook/useWriteContract";
 import Loading from "@/components/Loading";
+import { useReadContract } from "@/hook/useReadContract";
+import { getMetadata } from "@/hook/useUploadNFTStorage";
+import Link from "next/link";
 
 const Profile: React.FC = () => {
   const router = useRouter()
   const { address } = router.query
   const { data: channels } = useReadTableLand("Channels");
   const { data: sub } = useReadTableLand("Subscriptions");
+  const { data: videoNft } = useReadTableLand("Videos");
   const subcribers = useGetSubcriber()
   const { isLoading, triggerSubscribe } = useWriteContract();
   const { triggerOptin } = useSubcribe()
 
   const account = useAccount();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
-
-  const videos = [
-    {
-      id: 1,
-      title: "Video 1",
-      thumbnail: "https://via.placeholder.com/300x200",
-    },
-    {
-      id: 2,
-      title: "Video 2",
-      thumbnail: "https://via.placeholder.com/300x200",
-    },
-    {
-      id: 3,
-      title: "Video 3",
-      thumbnail: "https://via.placeholder.com/300x200",
-    },
-  ];
 
   const currentChannel = useMemo(
     () => {
@@ -97,6 +83,14 @@ const Profile: React.FC = () => {
     , [sub, address]
   )
 
+  const ownedVideos = useMemo(() => {
+    if(!videoNft || !account) {return 0}
+      const fillter =  videoNft.filter((data : any) => (
+        data.owner_address.toLowerCase() === String(address).toLowerCase()
+      ))
+      return fillter
+  }, [videoNft, address])
+
   return (
     <Layout>
       <div className="max-w-screen mx-auto px-4 sm:px-6 lg:px-8">
@@ -131,20 +125,8 @@ const Profile: React.FC = () => {
             <div className="p-4">
               <Text content="Video" size='text-2xl'/>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mt-4">
-                {videos.map((video) => (
-                  <div
-                    key={video.id}
-                    className="bg-gray-200 rounded-md overflow-hidden shadow-md"
-                  >
-                    <img
-                      className="w-full h-40 object-cover"
-                      src={video.thumbnail}
-                      alt={video.title}
-                    />
-                    <div className="p-4">
-                      <h3 className="text-lg font-semibold">{video.title}</h3>
-                    </div>
-                  </div>
+                {videoNft && videoNft.map((video: any, id: number) => (
+                  <ProfileVideo video={video} key={id}/>
                 ))}
               </div>
             </div>
@@ -201,6 +183,52 @@ function ProfileENS({address}:{address: string}) {
           {isCopied ? <CheckIcon/> : <CopyIcon/>}
         </button>
       </div>
+    </div>
+  )
+}
+
+function ProfileVideo({video}:{video:any}){
+  const [metadata, setMetadata] = useState<any>(null)
+  const { data } = useReadContract(video.video_erc721_address, "tokenURI", [video.tokenId]);
+  useEffect(() => {
+    const fetchMeta = async () => {
+      const res = await getMetadata(data)
+      setMetadata(res)
+    }
+    if(data) fetchMeta()
+  }, [data])
+
+  return(
+    <div className="bg-gray-200 rounded-md overflow-hidden shadow-md">
+      {metadata && metadata.image ?
+      <Link href={`/video?videoUrl=${metadata.image}`}>
+        <div>
+          <img
+            className="w-full h-40 object-cover"
+            src="https://idsb.tmgrup.com.tr/ly/uploads/images/2021/03/23/102271.jpg"
+            alt="video 1"
+          />
+          <div className="p-4">
+            <h3 className="text-lg font-semibold">{metadata && metadata.name ? metadata.name : 'Default'}</h3>
+            <p className="text-gray-500">Video contract: {shortenAddress(video.video_erc721_address)}</p>
+            <p className="text-gray-500">tokenId: {video.tokenId}</p>
+          </div>
+        </div>
+      </Link>
+      :
+      <div>
+        <img
+        className="w-full h-40 object-cover"
+        src="https://idsb.tmgrup.com.tr/ly/uploads/images/2021/03/23/102271.jpg"
+        alt="video 1"
+        />
+        <div className="p-4">
+          <h3 className="text-lg font-semibold">{metadata && metadata.name ? metadata.name : 'Default'}</h3>
+          <p className="text-gray-500">Video contract: {shortenAddress(video.video_erc721_address)}</p>
+          <p className="text-gray-500">tokenId: {video.tokenId}</p>
+        </div>
+      </div>
+      }
     </div>
   )
 }

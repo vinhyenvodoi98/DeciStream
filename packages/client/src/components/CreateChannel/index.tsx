@@ -25,7 +25,7 @@ const CreateChannel: React.FC<ModalProps> = ({ isOpen, onOpen, onClose }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     setIsLoading(true)
-    subcribers.data.subscribers.includes(String(address).toLocaleLowerCase()) || await triggerOptin()
+    subcribers.data.subscribers.includes(String(address).toLocaleLowerCase()) || await triggerOptin() //Update later
     if(image) {
       e.preventDefault();
       const channelImage = await useUploadImage(image)

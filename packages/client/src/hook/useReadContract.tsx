@@ -2,24 +2,22 @@
 import { QueryClient, useQuery } from '@tanstack/react-query';
 import { readContract } from '@wagmi/core';
 
-import DeployedContract from '../../../contracts/contractInfo.json';
-// import { useAccount } from 'wagmi';
-import CounterAbi from '../../../contracts/out/Counter.sol/Counter.json';
+import VideosAbi from '../../../contracts/out/Videos.sol/Videos.json';
 
-export function getReadContractKey(functionName: string, params?: Array<any>) {
-  return ['readContract', functionName, params];
+export function getReadContractKey(contractAddress:string, functionName: string, params?: Array<any>) {
+  return ['readContract', contractAddress, functionName, params];
 }
 
-export function useReadContract(functionName: string, params?: Array<any>) {
+export function useReadContract(contractAddress: string, functionName: string, params?: Array<any>) {
   const {
     isLoading,
     isError: hasError,
     data: data,
   } = useQuery({
-    queryKey: getReadContractKey(functionName, params),
+    queryKey: getReadContractKey(contractAddress, functionName, params),
     queryFn: () => {
       if (!functionName) return null;
-      return fetchContractData(functionName, params);
+      return fetchContractData(contractAddress ,functionName, params);
     },
     refetchInterval: 7500,
   });
@@ -29,21 +27,23 @@ export function useReadContract(functionName: string, params?: Array<any>) {
 
 export function getCachedReadContract(
   queryClient: QueryClient,
+  contractAddress: string,
   functionName: string,
   params?: Array<any>
 ) {
-  return queryClient.getQueryData(getReadContractKey(functionName, params));
+  return queryClient.getQueryData(getReadContractKey(contractAddress, functionName, params));
 }
 
 async function fetchContractData(
+  contractAddress: string,
   functionName: string,
   params?: Array<any>
 ): Promise<any> {
   const data = await readContract({
-    address: DeployedContract.deployedTo as `0x${string}`,
-    abi: CounterAbi.abi,
+    address: contractAddress as `0x${string}`,
+    abi: VideosAbi.abi,
     functionName: functionName,
     args: params || [],
   });
-  return data.toString();
+  return data;
 }

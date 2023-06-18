@@ -1,0 +1,54 @@
+[
+  {
+    "lastSeen": 1687072238668,
+    "isActive": false,
+    "record": true,
+    "suspended": false,
+    "sourceSegments": 36,
+    "transcodedSegments": 108,
+    "sourceSegmentsDuration": 72.31,
+    "transcodedSegmentsDuration": 216.93,
+    "sourceBytes": 40472076,
+    "transcodedBytes": 32680040,
+    "id": "0d91f7cd-75d1-4522-92d2-457a2951bcd9",
+    "kind": "session",
+    "name": "videorec+d8fdmblr939s01p0",
+    "userId": "6e2d4267-8816-41cf-b0a2-025dd02b4111",
+    "deleted": false,
+    "version": "v2",
+    "parentId": "d8fd478a-981f-4152-9103-37b9a856b4a1",
+    "profiles": [
+      {
+        "fps": 30,
+        "gop": "2.0",
+        "name": "720p",
+        "width": 1280,
+        "height": 720,
+        "bitrate": 2000000
+      },
+      {
+        "fps": 30,
+        "gop": "2.0",
+        "name": "480p",
+        "width": 854,
+        "height": 480,
+        "bitrate": 1000000
+      },
+      {
+        "fps": 30,
+        "gop": "2.0",
+        "name": "360p",
+        "width": 640,
+        "height": 360,
+        "bitrate": 500000
+      }
+    ],
+    "createdAt": 1687072137828,
+    "ingestRate": 0,
+    "playbackId": "d8fdmblr939s01p0",
+    "outgoingRate": 0,
+    "recordingStatus": "ready",
+    "recordingUrl": "https://lp-playback.com/hls/0d918fqvik9bxmgd/index.m3u8",
+    "mp4Url": "https://lp-playback.com/hls/0d918fqvik9bxmgd/1080p0.mp4"
+  }
+]
