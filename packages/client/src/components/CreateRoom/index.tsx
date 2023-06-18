@@ -2,9 +2,11 @@ import useLivePeer from "@/hook/useLivePeer";
 import { useReadTableLand } from "@/hook/useReadTableLand";
 import { useWriteContract } from "@/hook/useWriteContract";
 import { shortenAddress } from "@/utils/addresses";
+import { useCreateStream } from "@livepeer/react";
 import { useRouter } from "next/router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useAccount } from "wagmi";
+import Loading from "../Loading";
 import Text from "../Text";
 import DropdownInput from "./DrowdownInput";
 
@@ -13,9 +15,14 @@ export default function CreateRoom () {
   const router = useRouter();
   const [inviteeAddress, setInviteeAdress] = useState<any>(null);
   const [roomId, setRoomId] = useState('')
-  const { useCreate, useInvite, useClose ,useCloseStream, useOpenStream } = useLivePeer()
-  const { triggerInviteNoti } = useWriteContract()
+  const [topic, setTopic] = useState('')
+  const { isLoading: liveLoading ,useCreate, useInvite, useClose ,useCloseStream, useOpenStream } = useLivePeer()
+  const { isLoading, triggerInviteNoti, triggerCreateStream} = useWriteContract()
   const { data: channel } = useReadTableLand("Channels")
+
+  const {
+    mutateAsync: createStream,
+  } = useCreateStream({ name: address as string });
 
   const channelOptions = useMemo(() => {
     if (!channel) return []
@@ -27,13 +34,18 @@ export default function CreateRoom () {
     })
   }, [channel])
 
-  const handleCreate = async () => {
-    console.log("create")
-    const data = await useCreate()
-    setRoomId(data.id)
+  useEffect(() => {
+    if(router.query.roomId) setRoomId(router.query.roomId as string)
+  }, [router.query.roomId])
 
-    const invite = await useInvite(data.id, address as string)
-    router.push(`/live?joinUrl=${invite.joinUrl}`);
+  const handleCreate = async () => {
+    if(topic.trim() !==''){
+      const data = await useCreate()
+      setRoomId(data.id)
+
+      const invite = await useInvite(data.id, address as string)
+      router.push(`/live?joinUrl=${invite.joinUrl}&roomId=${data.id}`);
+    }
   }
 
   const handleInvite = async () => {
@@ -45,41 +57,55 @@ export default function CreateRoom () {
   }
 
   const handleOpenStream = async () => {
-    const data = await useOpenStream(roomId)
-    console.log(data)
+    const stream = await createStream?.()
+    if(stream){
+      await triggerCreateStream(topic, stream.playbackId, stream.id)
+      await useOpenStream(roomId, stream.id as string)
+    }
   }
 
   const handleCloseStream = async () => {
-    const data = await useCloseStream(roomId)
-    console.log(data)
+    await useCloseStream(roomId)
   }
 
   const handleClose = async () => {
-    console.log("close")
-    const data = await useClose(roomId)
-    console.log(data)
+    await useClose(roomId)
     setRoomId('')
   }
 
+  const handleTopicChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setTopic(e.target.value);
+  };
+
   return (
     <div className="p-4 flex flex-col justify-between h-full">
-      <div className="flex justify-between">
+      <Loading isVisible={isLoading || liveLoading}/>
+      <div className="">
         <Text content="Create Room" size="text-xl"/>
+      </div>
+      <div className="grid grid-cols-7 h-10 gap-4">
+        <input
+          type="text"
+          className="border border-gray-300 rounded px-4 py-2 mb-2 h-10 focus:outline-none focus:border-blue-500 col-span-5"
+          placeholder="Enter Topic"
+          value={topic}
+          onChange={handleTopicChange}
+        />
         <button
           onClick={() => handleCreate()}
-          className="h-6 px-4 bg-blue-500 text-white rounded-full">
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded col-span-2 h-10">
           Create
         </button>
       </div>
       <div className="grid grid-cols-7 h-10 gap-4">
-        <div className="col-span-5">
+        <div className="col-span-5 h-10">
           <DropdownInput opt={channelOptions} inviteeAddress={inviteeAddress} setInviteeAdress={(inviteeAddress) => setInviteeAdress(inviteeAddress)}/>
         </div>
         <button
-            onClick={()=>handleInvite()}
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded col-span-2">
-            Invite
-          </button>
+          onClick={()=>handleInvite()}
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded col-span-2">
+          Invite
+        </button>
       </div>
       <div className="flex justify-between">
         <button

@@ -18,7 +18,7 @@ export function useGetSubcriber() {
     queryFn: () => {
       return fetchSubcriber();
     },
-    refetchInterval: 10500,
+    refetchInterval: 5500,
   });
 
   return { isLoading, hasError, data };
@@ -46,7 +46,7 @@ export function useGetNotifications(address: string) {
     queryFn: () => {
       return fetchNotifications(address);
     },
-    refetchInterval: 10500,
+    refetchInterval: 5500,
   });
 
   return { isLoading, hasError, data };

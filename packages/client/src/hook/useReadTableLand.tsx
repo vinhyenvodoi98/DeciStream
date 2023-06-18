@@ -19,6 +19,13 @@ interface Videos {
   tokenId: number;
 }
 
+interface Streams {
+  user_address: string;
+  topic: string;
+  playbackId: string;
+  streamId: string;
+}
+
 export function getReadTableLand(table:string) {
   return ['tableLand', table];
 }
@@ -31,7 +38,7 @@ export function useReadTableLand(table:string) {
   } = useQuery({
     queryKey: getReadTableLand(table),
     queryFn: () => {
-      return fetchChannelsData(table);
+      return fetchTableData(table);
     },
     refetchInterval: 10500,
   });
@@ -39,9 +46,10 @@ export function useReadTableLand(table:string) {
   return { isLoading, hasError, data };
 }
 
-async function fetchChannelsData(table: string): Promise<any> {
-  const db = new Database<Channels | Subscriptions | Videos>();
+async function fetchTableData(table: string): Promise<any> {
+  const db = new Database<Channels | Subscriptions | Videos | Streams>();
   let data;
+
   switch (table) {
     case 'Channels':
       data = await db.prepare<Channels>(`SELECT * FROM ${process.env.NEXT_PUBLIC_CHANNELS_TABLE} ;`).all();
@@ -56,6 +64,9 @@ async function fetchChannelsData(table: string): Promise<any> {
       break;
     case 'Videos':
       data = await db.prepare<Videos>(`SELECT * FROM ${process.env.NEXT_PUBLIC_VIDEOS_TABLE};`).all();
+      break;
+    case 'Streams':
+      data = await db.prepare<Streams>(`SELECT * FROM ${process.env.NEXT_PUBLIC_STREAMS_TABLE};`).all();
       break;
     default:
       console.log('Unknown ');

@@ -11,7 +11,6 @@ type ParsedContent = string | JSX.Element;
 
 const EditorJsRenderer = ({ data }: Props) => {
   const html = EditorJsToHtml.parse(data) as ParsedContent[];
-  console.log({html})
   return (
     //✔️ It's important to add key={data.time} here to re-render based on the latest data.
     <div className="prose max-w-full" key={data.time}>

@@ -1,10 +1,9 @@
-import * as React from 'react';
 import Text from '../Text';
-
 import Wallet from '../Wallet';
 import { LiveIcon, WriteIcon } from '../Icon';
 import Link from 'next/link';
 import Notification from '../Notification';
+import Image from 'next/image';
 
 export default function Header() {
   return (
@@ -12,6 +11,7 @@ export default function Header() {
     <header className='top-0 z-50 bg-white'>
       <div className='flex h-20 items-center justify-between'>
         <Link href="/" className='flex items-center pr-6'>
+          <Image height={40} width={40} src='/images/logo.png' alt="DeciStream Logo"/>
           <Text content="ĐeciStreams" size='text-2xl'/>
         </Link>
         <div className='flex items-center'>

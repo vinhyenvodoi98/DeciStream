@@ -13,13 +13,14 @@ export default function Streamers() {
 
   const subChannels = useMemo(() => {
     if (!subscribedChannel) return []
-    return subscribedChannel.map((data : any) => data.user_address)
-  }, [subscribedChannel])
+    return subscribedChannel.filter((sub:any) => sub.subscriber_address === String(address).toLocaleLowerCase()).map((data : any) => data.user_address)
+  }, [subscribedChannel, address])
 
   const otrChannels = useMemo(() => {
-    if (!channels || !subChannels || subChannels.length === 0 || !address) return []
+    if ( channels && subChannels.length === 0 && subscribedChannel) return subscribedChannel.filter((sub:any) => sub.user_address !== String(address).toLocaleLowerCase()).map((data : any) => data.user_address)
+    if (!channels || !subChannels || !address) return []
     return channels.filter((channel:any) => !subChannels.includes(channel.user_address) && address.toLocaleLowerCase() !== channel.user_address).map((data : any) => data.user_address)
-  }, [channels, subChannels, address])
+  }, [channels, subscribedChannel, subChannels, address])
 
   return (
     <div className="py-6 grid grid-rows-3 gap-4">

@@ -15,6 +15,7 @@ contract Master is Ownable {
   mapping (string => uint256) private _tables;
   mapping (address => bool) private _subcriptionsAddresses;
   mapping (address => bool) private _videosAddresses;
+  mapping (address => bool) private _usersAddresses;
   address private _epnsAddress = 0xb3971BCef2D791bc4027BbfedFb47319A4AAaaAa;
   address private _epnsChannel = 0xdA0AE9002cE609F8707f4Cb5D45704b7aAa78624;
 
@@ -25,6 +26,11 @@ contract Master is Ownable {
 
   modifier onlyVideos() {
     require(_videosAddresses[msg.sender], "Caller is not videos");
+    _;
+  }
+
+  modifier onlyUsers() {
+    require(_usersAddresses[msg.sender], "Caller is not users");
     _;
   }
 
@@ -64,6 +70,19 @@ contract Master is Ownable {
         )
     );
     _tables[channels] = channelsTableId;
+
+    string memory streams= "Streams";
+    uint256 streamsTableId = TablelandDeployments.get().create(
+        address(this),
+        SQLHelpers.toCreateFromSchema(
+            "user_address text,"
+            "topic text,"
+            "playbackId text,"
+            "streamId text",
+            streams
+        )
+    );
+    _tables[streams] = streamsTableId;
   }
 
   function createChannel(string memory name, string memory symbol, string memory uri) external {
@@ -74,6 +93,8 @@ contract Master is Ownable {
     Videos video = new Videos(name, symbol);
     video.transferOwnership(msg.sender);
     _subcriptionsAddresses[address(video)] = true;
+
+    _usersAddresses[msg.sender] = true;
 
     TablelandDeployments.get().mutate(
       address(this),
@@ -179,6 +200,8 @@ contract Master is Ownable {
         filters
       )
     );
+
+    // TODO notify subnet
   }
 
   function newSubsribeNotify(address to, address subscriber) external onlySubcriptions {
@@ -203,7 +226,7 @@ contract Master is Ownable {
     );
   }
 
-  function inviteNotify(address to, string memory inviteLink) external {
+  function inviteNotify(address to, string memory inviteLink) external onlyUsers {
     IPUSHCommInterface(_epnsAddress).sendNotification(
       _epnsChannel,
       to,
@@ -223,7 +246,42 @@ contract Master is Ownable {
     );
   }
 
-  function newVideoNotify() external onlySubcriptions {
+  function createStream(string memory topic, string memory playbackId, string memory streamId) external {
+    TablelandDeployments.get().mutate(
+      address(this),
+      _tables["Streams"],
+      SQLHelpers.toInsert(
+        "Streams",
+        _tables["Streams"],
+        "user_address,topic,playbackId,streamId",
+        string.concat(
+          SQLHelpers.quote(Strings.toHexString(msg.sender)),
+          ",",
+          SQLHelpers.quote(topic),
+          ",",
+          SQLHelpers.quote(playbackId),
+          ",",
+          SQLHelpers.quote(streamId)
+        )
+      )
+    );
+    // IPUSHCommInterface(_epnsAddress).sendNotification(
+    //   _epnsChannel,
+    //   to,
+    //   bytes(
+    //     string(
+    //       abi.encodePacked(
+    //           "0",
+    //           "+",
+    //           "4",
+    //           "+",
+    //           "Stream invitation !",
+    //           "+",
+    //           inviteLink
+    //       )
+    //     )
+    //   )
+    // );
 
   }
 

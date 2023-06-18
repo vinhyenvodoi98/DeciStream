@@ -10,6 +10,7 @@ import CreateChannel from "@/components/CreateChannel";
 import { useReadTableLand } from "@/hook/useReadTableLand";
 import { useGetSubcriber, useSubcribe } from "@/hook/usePush";
 import { useWriteContract } from "@/hook/useWriteContract";
+import Loading from "@/components/Loading";
 
 const Profile: React.FC = () => {
   const router = useRouter()
@@ -17,7 +18,7 @@ const Profile: React.FC = () => {
   const { data: channels } = useReadTableLand("Channels");
   const { data: sub } = useReadTableLand("Subscriptions");
   const subcribers = useGetSubcriber()
-  const { triggerSubscribe } = useWriteContract();
+  const { isLoading, triggerSubscribe } = useWriteContract();
   const { triggerOptin } = useSubcribe()
 
   const account = useAccount();
@@ -52,6 +53,7 @@ const Profile: React.FC = () => {
 
   const handleSubcribe = async () => {
     subcribers.data.subscribers.includes(String(account.address).toLocaleLowerCase()) || await triggerOptin()
+    console.log(currentChannel.subscription_erc721_address)
     await triggerSubscribe(currentChannel.subscription_erc721_address);
   }
 
@@ -84,29 +86,46 @@ const Profile: React.FC = () => {
     [sub, account.address, address],
   )
 
+  const subcriber = useMemo(
+    () => {
+    if(!sub || !account) {return 0}
+      const fillter =  sub.filter((data : any) => (
+        data.user_address.toLowerCase() === String(address).toLowerCase()
+      ))
+      return fillter.length
+    }
+    , [sub, address]
+  )
+
   return (
     <Layout>
       <div className="max-w-screen mx-auto px-4 sm:px-6 lg:px-8">
+        <Loading isVisible={isLoading} />
         <div className="flex flex-col items-start mt-6">
           <div className="w-full bg-white overflow-hidden">
             <div className="flex justify-between">
-              {address && <ProfileENS address={address as string}/> }
-                <div className="flex items-end">
-                  {
-                    isProfile
-                    ?
-                      isHaveChannel || <CreateChannel isOpen={isCreateModalOpen} onOpen={()=>setIsCreateModalOpen(true)} onClose={()=>setIsCreateModalOpen(false)}/>
-                    :
-                      isHaveChannel &&
-                      <button
-                        className={`${isSubscribed ? "bg-transparent border-2 border-black" : "bg-black text-white "} ml-auto font-bold py-2 px-4 rounded-xl`}
-                        onClick={() => handleSubcribe()}
-                        disabled={isSubscribed}
-                        >
-                          {isSubscribed ? "Subscribed  😻" : "Subscribe 🤔"}
-                      </button>
-                  }
-                </div>
+              {address &&
+              <div>
+                <ProfileENS address={address as string}/>
+                <div className="ml-6">{subcriber} Subcriber</div>
+              </div>
+              }
+              <div className="flex items-end">
+                {
+                  isProfile
+                  ?
+                    isHaveChannel || <CreateChannel isOpen={isCreateModalOpen} onOpen={()=>setIsCreateModalOpen(true)} onClose={()=>setIsCreateModalOpen(false)}/>
+                  :
+                    isHaveChannel &&
+                    <button
+                      className={`${isSubscribed ? "bg-transparent border-2 border-black" : "bg-black text-white "} ml-auto font-bold py-2 px-4 rounded-xl`}
+                      onClick={() => handleSubcribe()}
+                      disabled={isSubscribed}
+                      >
+                        {isSubscribed ? "Subscribed  😻" : "Subscribe 🚀"}
+                    </button>
+                }
+              </div>
             </div>
             <hr className="my-4"/>
             <div className="p-4">

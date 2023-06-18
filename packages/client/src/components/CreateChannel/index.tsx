@@ -4,6 +4,7 @@ import { useWriteContract } from '@/hook/useWriteContract';
 import { useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { useAccount } from 'wagmi';
+import Loading from '../Loading';
 import Text from '../Text';
 
 interface ModalProps {
@@ -14,6 +15,7 @@ interface ModalProps {
 
 const CreateChannel: React.FC<ModalProps> = ({ isOpen, onOpen, onClose }) => {
   const subcribers = useGetSubcriber()
+  const [isLoading, setIsLoading] = useState(false)
   const [name, setName] = useState('');
   const [symbol, setSymbol] = useState('');
   const [image, setImage] = useState<File | null>(null);
@@ -22,7 +24,7 @@ const CreateChannel: React.FC<ModalProps> = ({ isOpen, onOpen, onClose }) => {
   const { triggerOptin } = useSubcribe()
 
   const handleSubmit = async (e: React.FormEvent) => {
-    console.log(subcribers.data)
+    setIsLoading(true)
     subcribers.data.subscribers.includes(String(address).toLocaleLowerCase()) || await triggerOptin()
     if(image) {
       e.preventDefault();
@@ -30,6 +32,7 @@ const CreateChannel: React.FC<ModalProps> = ({ isOpen, onOpen, onClose }) => {
       await triggerMasterTransactions("createChannel", [name, symbol ,`https://${channelImage}.ipfs.nftstorage.link`])
       onClose();
     }
+    setIsLoading(false)
   };
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -41,6 +44,7 @@ const CreateChannel: React.FC<ModalProps> = ({ isOpen, onOpen, onClose }) => {
 
   return (
     <div>
+      <Loading isVisible={isLoading} />
       <button
         className="ml-auto bg-black text-white font-bold py-2 px-4 rounded-xl"
         onClick={onOpen}

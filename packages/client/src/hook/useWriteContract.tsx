@@ -1,4 +1,4 @@
-import { writeContract } from '@wagmi/core';
+import { writeContract, waitForTransaction } from '@wagmi/core';
 import { useCallback, useState } from 'react';
 
 import DeployedContract from '../../../contracts/contractInfo.json';
@@ -19,6 +19,9 @@ export function useWriteContract() {
           functionName: functionName,
           args: params || [],
         });
+        const data = await waitForTransaction({
+          hash
+        })
       } catch (error) {
         console.log(error)
       }
@@ -38,6 +41,9 @@ export function useWriteContract() {
           functionName: "mint",
           args: [],
         });
+        const data = await waitForTransaction({
+          hash
+        })
       } catch (error) {
         console.log(error)
       }
@@ -49,7 +55,6 @@ export function useWriteContract() {
   const triggerInviteNoti = useCallback(
     async (to: string, inviteLink: string) => {
       setIsLoading(true);
-      console.log(to, inviteLink)
       try {
         const { hash } = await writeContract({
           mode: "recklesslyUnprepared",
@@ -58,6 +63,31 @@ export function useWriteContract() {
           functionName: "inviteNotify",
           args: [to, inviteLink],
         });
+        const data = await waitForTransaction({
+          hash
+        })
+      } catch (error) {
+        console.log(error)
+      }
+      setIsLoading(false);
+    },
+    [setIsLoading]
+  );
+
+  const triggerCreateStream = useCallback(
+    async (topic: string, playbackId: string, streamId: string) => {
+      setIsLoading(true);
+      try {
+        const { hash } = await writeContract({
+          mode: "recklesslyUnprepared",
+          address: DeployedContract.deployedTo as `0x${string}`,
+          abi: MasterAbi.abi,
+          functionName: "createStream",
+          args: [topic, playbackId, streamId],
+        });
+        const data = await waitForTransaction({
+          hash
+        })
       } catch (error) {
         console.log(error)
       }
@@ -70,6 +100,7 @@ export function useWriteContract() {
     isLoading,
     triggerMasterTransactions,
     triggerSubscribe,
-    triggerInviteNoti
+    triggerInviteNoti,
+    triggerCreateStream
   };
 }
